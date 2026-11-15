@@ -1,0 +1,26 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Fictional RPC diagnostic</title></head><body><h1>Fictional RPC diagnostic</h1><p id="status" role="status">READER_BOOT: waiting for initialization</p><div id="content"></div><script>
+(() => {
+ const BUILD='rpc-probe-1';let session=null,origin=null,pending=null,finished=false,budget=60;
+ const status=document.querySelector('#status');
+ function log(stage,meta={}){status.textContent=stage;if(budget-->0)console.info('[CodexRPC]',JSON.stringify({build:BUILD,side:'reader',stage,...meta}));}
+ function observe(stage){if(session)try{parent.postMessage({type:'codex-probe-observation',version:1,session,stage},origin);}catch(_){log('CHILD_OBSERVATION_SEND_THROW');}}
+ function request(id,action,payload){if(finished)return;pending={id,action};log('REQUEST_SEND',{rpc:id,action});try{parent.postMessage({type:'codex-request',version:1,session,revision:0,intent:0,id,action,payload},origin);log('REQUEST_POST_RETURNED',{rpc:id,action});}catch(_){finished=true;log('CHILD_SEND_THROW');}}
+ log('READER_BOOT');
+ addEventListener('message',event=>{const m=event.data;
+  if(event.source!==parent){log('REPLY_REJECT_SOURCE');return;}
+  if(m?.type==='codex-init'&&m.version===1&&!session&&typeof m.session==='string'&&m.session.length>0&&m.session.length<=200){session=m.session;origin=event.origin;log('INIT_ACCEPTED',{opaqueParent:origin==='null'});observe('INIT_ACCEPTED');request('1','selection',{campaign:'main',through:'2'});return;}
+  if(m?.type!=='codex-response')return;if(finished){log('REPLY_IGNORE_FINISHED');return;}
+  log('REPLY_RECEIVED',{rpc:/^\d{1,4}$/.test(m.id||'')?m.id:undefined});observe('REPLY_RECEIVED');
+  if(event.origin!==origin){log('REPLY_REJECT_ORIGIN');observe('REPLY_REJECT_ORIGIN');return;}
+  if(m.version!==1||m.session!==session){log('REPLY_REJECT_SESSION_VERSION');observe('REPLY_REJECT_SESSION_VERSION');return;}
+  if(m.revision!==0){log('REPLY_REJECT_REVISION');observe('REPLY_REJECT_REVISION');return;}
+  if(!pending||m.id!==pending.id){log('REPLY_IGNORE_ID');observe('REPLY_IGNORE_ID');return;}
+  if(!m.ok){finished=true;pending=null;log('REPLY_REJECT_NOT_OK');observe('REPLY_REJECT_NOT_OK');return;}
+  const action=pending.action;pending=null;
+  if(action==='selection'){if(m.value?.episode!==2){finished=true;log('REPLY_REJECT_SELECTION_PAYLOAD');observe('REPLY_REJECT_SELECTION_PAYLOAD');return;}log('REPLY_ACCEPTED_SELECTION');observe('REPLY_ACCEPTED_SELECTION');request('2','read',{campaign:'main',episode:2,search:'',category:'',slug:''});}
+  else{if(m.value?.status!=='ready'||m.value.selectedEpisode!==2||!Array.isArray(m.value.entries)){finished=true;log('REPLY_REJECT_READ_PAYLOAD');observe('REPLY_REJECT_READ_PAYLOAD');return;}finished=true;log('REPLY_ACCEPTED_READ');observe('REPLY_ACCEPTED_READ');document.querySelector('#content').textContent='FICTIONAL ROUNDTRIP COMPLETE';log('RENDERED');observe('RENDERED');}
+ });
+ parent.postMessage({type:'codex-ready',version:1},'*');log('READER_READY_SENT');
+ setTimeout(()=>{if(!finished){finished=true;pending=null;log('READER_TIMEOUT');observe('READER_TIMEOUT');}},12000);
+})();
+</script></body></html>
