@@ -1,0 +1,680 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow,noarchive"><title>Kyranda Codex reader</title><style>:root{color-scheme:light;--paper:#faf8f2;--ink:#292824;--muted:#67665d;--line:#d6d1c5;--accent:#704b2c;--panel:#f0ece2;font-family:Arial,Helvetica,sans-serif;color:var(--ink);background:var(--paper)}*{box-sizing:border-box}body{margin:0}button,input,select{font:inherit}button,a,input,select,summary{-webkit-tap-highlight-color:transparent}button,a{color:var(--accent)}button{cursor:pointer}a{color:var(--accent)}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid #9c6c31;outline-offset:3px}button:disabled{cursor:default}#reader{max-width:1800px;margin:auto;padding:0 clamp(16px,3vw,52px) 24px}.skip{position:fixed;top:-100px;background:white;padding:12px;z-index:9}.skip:focus{top:10px}.notice{font-size:11px;letter-spacing:.08em;line-height:1.6;padding:10px 0;color:#695b47;border-bottom:1px solid var(--line)}.masthead{display:flex;justify-content:space-between;align-items:center;padding:28px 0 24px}.eyebrow{text-transform:uppercase;font-size:10px;letter-spacing:.19em;color:var(--muted);font-weight:bold;margin:0 0 10px}.brand{font:400 clamp(30px,3vw,48px)/1.1 Georgia,serif;margin:0;letter-spacing:-.04em}.brand span{color:var(--accent)}.tagline{font-size:13px;color:var(--muted);margin:10px 0 0}.seal{font:36px Georgia,serif;border:1px solid #b39b76;outline:1px solid #b39b76;outline-offset:5px;width:55px;height:55px;display:grid;place-items:center;color:var(--accent);margin:6px}.toolbar{display:grid;grid-template-columns:200px 210px minmax(180px,1fr);gap:18px;background:var(--panel);border-block:1px solid var(--line);padding:18px 20px;align-items:end}.toolbar label{display:block;font-size:11px;letter-spacing:.04em;color:#514c40;font-weight:bold}.toolbar select,.toolbar input{width:100%;min-width:0;height:40px;padding:8px 10px;background:#fffdf8;border:1px solid #c8c1b2;border-radius:3px;color:var(--ink);margin-top:7px}.toolbar form{margin:0}.search-wrap{position:relative}.search-wrap input{padding-right:40px}.search-wrap button{position:absolute;right:1px;bottom:1px;width:38px;height:38px;border:0;background:transparent;font-size:26px;color:var(--accent)}.wiki-layout{display:grid;grid-template-columns:200px minmax(0,1fr) 280px;grid-template-areas:'browse heading info' 'browse body info' 'browse related info';gap:0 30px;padding-top:30px;align-items:start}.browse{grid-area:browse;min-width:0;padding-right:20px;border-right:1px solid var(--line)}.browse details>summary{font:18px Georgia,serif;cursor:pointer;margin-bottom:18px}.browse h2{font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin:25px 0 10px}.browse ul{list-style:none;margin:0;padding:0}.browse button{display:block;text-align:left;width:100%;border:0;background:transparent;font-size:13px;padding:7px 0;line-height:1.5;overflow-wrap:anywhere}.browse button:hover{text-decoration:underline}.browse button[aria-pressed=true]{font-weight:bold}.all-link{font-weight:bold!important}.article-heading{grid-area:heading;min-width:0}.breadcrumbs{font-size:11px;color:var(--muted);line-height:1.7;margin-bottom:22px}.breadcrumbs button{background:none;border:0;padding:0;text-decoration:underline;font-size:inherit}.article-title{font:400 clamp(28px,3vw,42px)/1.15 Georgia,serif;letter-spacing:-.025em;margin:0 0 18px;overflow-wrap:anywhere}.article-intro{font:18px/1.7 Georgia,serif;margin:0 0 20px;padding-bottom:20px;border-bottom:1px solid var(--line);overflow-wrap:anywhere}.article-body{grid-area:body;min-width:0;outline:none}.article-body h3{font:400 25px/1.3 Georgia,serif;margin:26px 0 13px;border-bottom:1px solid var(--line);padding-bottom:8px;scroll-margin-top:20px}.article-body p{font:17px/1.85 Georgia,serif;margin:0 0 17px;white-space:pre-line;overflow-wrap:anywhere}.contents{background:#f2efe7;border:1px solid var(--line);padding:12px 16px;font-size:13px;max-width:440px;margin:0 0 24px}.contents summary{cursor:pointer}.contents ol{line-height:1.9;padding-left:22px;margin-bottom:0}.directory{list-style:none;margin:0;padding:0}.directory li{padding:18px 0;border-bottom:1px solid var(--line)}.entry-title{font:22px Georgia,serif;background:none;border:0;padding:0;text-align:left}.entry-title:hover{text-decoration:underline}.entry-category{display:block;text-transform:uppercase;color:var(--muted);font-size:10px;letter-spacing:.1em;margin:9px 0}.directory li p{font:15px/1.7 Arial,sans-serif;margin:0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.infobox{grid-area:info;min-width:0;background:#f2eee3;border:1px solid #c4b9a4;margin-top:0}.infobox h3{font:22px/1.4 Georgia,serif;text-align:center;margin:0;padding:17px 12px;background:#e7dfcf;border-bottom:1px solid #c4b9a4;overflow-wrap:anywhere}.infobox figure{margin:0}.infobox img{display:block;width:100%;max-height:420px;object-fit:contain;background:#e9e4d7}.infobox figcaption{font-size:12px;line-height:1.6;padding:12px;border-bottom:1px solid var(--line);overflow-wrap:anywhere}.art-placeholder{font:italic 13px/1.6 Georgia,serif;padding:26px 12px;text-align:center;color:var(--muted);margin:0;border-bottom:1px solid var(--line)}.infobox dl{display:grid;grid-template-columns:minmax(75px,1fr) minmax(0,1.6fr);font-size:12px;line-height:1.6;margin:0}.infobox dt,.infobox dd{padding:11px 12px;border-bottom:1px solid var(--line);margin:0;overflow-wrap:anywhere}.infobox dt{font-weight:bold}.related{grid-area:related;border-top:1px solid var(--line);margin-top:30px;padding-top:20px;min-width:0}.related:empty{display:none}.related h3{font:23px Georgia,serif;margin:0 0 14px}.related ul{display:flex;flex-wrap:wrap;gap:10px 24px;list-style:none;padding:0}.related button{border:0;background:none;padding:0;font-size:14px;text-decoration:underline;line-height:1.7;text-align:left}.reader-footer{border-top:1px solid var(--line);margin-top:34px;padding-top:12px;font-size:11px;line-height:1.8;color:var(--muted);display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}.reader-footer p{margin:0}[hidden]{display:none!important}.state-message{min-height:150px;padding:18px 0}
+@media(min-width:1600px){.wiki-layout{grid-template-columns:230px minmax(0,1fr) 310px;gap:0 42px}}
+@media(max-width:1100px){.wiki-layout{grid-template-columns:165px minmax(0,1fr) 245px;gap:0 20px}.toolbar{grid-template-columns:170px 180px minmax(160px,1fr)}}
+@media(max-width:999px){.wiki-layout{grid-template-columns:minmax(0,1fr) 250px;grid-template-areas:'browse browse' 'heading info' 'body info' 'related related';gap:20px 24px}.browse{border:1px solid var(--line);padding:14px 18px;margin-bottom:0}.browse details>summary{margin:0}.browse details[open]>summary{margin-bottom:15px}.browse details>div{columns:2;column-gap:30px}.browse h2{break-after:avoid}.browse li{break-inside:avoid}.toolbar{grid-template-columns:1fr 1fr}.toolbar form{grid-column:1/-1}.article-title{font-size:32px}.seal{width:44px;height:44px;font-size:30px}}
+@media(max-width:650px){.masthead{padding:23px 0}.tagline{font-size:12px;max-width:250px}.seal{display:none}.toolbar{padding:15px 12px;gap:14px 10px}.toolbar label{font-size:10px}.toolbar select{font-size:13px;padding-inline:7px}.wiki-layout{grid-template-columns:minmax(0,1fr);grid-template-areas:'browse' 'heading' 'info' 'body' 'related';gap:22px;padding-top:22px}.browse details>div{columns:1}.article-intro{font-size:17px;margin-bottom:0}.breadcrumbs{margin-bottom:16px}.infobox{width:100%;max-width:430px;justify-self:center}.infobox dl{grid-template-columns:1fr 1.6fr}.article-body p{font-size:17px;line-height:1.8}.article-body h3{font-size:23px}.article-title{font-size:32px}.reader-footer{display:block}.reader-footer p+p{margin-top:7px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+
+/* Only the navigation panel moves; document flow and automatic-height measurement stay intact. */
+/* At the actual Wix embed width (938px), retain three columns. */
+@media(min-width:820px) and (max-width:999px){.wiki-layout{grid-template-columns:170px minmax(0,1fr) 200px;grid-template-areas:'browse heading info' 'browse body info' 'browse related info';gap:0 16px}.browse{border:0;border-right:1px solid var(--line);padding:0 10px 0 0;margin:0}.toolbar{grid-template-columns:1fr 1fr}.toolbar form{grid-column:1/-1}}
+@media(min-width:1000px){.wiki-layout{grid-template-columns:220px minmax(0,1fr) 250px;gap:0 24px}}
+/* A constrained real-world Wix embed can be ~520px on desktop: preserve a left rail, move the infobox into the article column. */
+@media(min-width:480px) and (max-width:819px){.wiki-layout{grid-template-columns:minmax(135px,34%) minmax(0,1fr);grid-template-areas:'browse heading' 'browse info' 'browse body' 'browse related';gap:12px 12px}.browse{border:0;border-right:1px solid var(--line);padding:0 8px 0 0;margin:0}.sidebar-panel{padding:8px}.toolbar{grid-template-columns:1fr 1fr}.toolbar form{grid-column:1/-1}.infobox{width:100%;max-width:100%}.article-title{font-size:28px}.article-intro{font-size:16px}.article-body p{font-size:16px}}
+.browse{padding-right:16px}.sidebar-panel{position:relative;transform:translateY(var(--dock-offset,0px));z-index:2;background:var(--paper);border:1px solid var(--line);border-radius:4px;padding:14px}
+.browse details>div{columns:auto}.browse .wiki-menu>summary{font:20px Georgia,serif;margin:0 0 12px}.browse .nav-group{border-top:1px solid var(--line);padding-top:12px;margin-top:12px}
+.browse .nav-group>summary{font:bold 12px Arial,sans-serif;margin:0;line-height:1.5}.browse .nav-group[open]>summary{margin-bottom:8px}
+.browse a{display:block;font-size:13px;line-height:1.5;padding:6px 0;overflow-wrap:anywhere;text-decoration:none}.browse a:hover{text-decoration:underline}
+.browse [aria-current=page],.browse [aria-current=location]{font-weight:bold;text-decoration:underline;text-underline-offset:3px}.browse button[aria-pressed=true]{color:var(--ink);font-weight:bold}
+.sidebar-toc{margin:0;padding-left:18px}.nav-pages{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;font-size:11px;margin-top:10px}.browse .nav-pages button{width:auto;font-size:11px}
+.inline-codex-link{text-decoration:underline;text-underline-offset:3px}.inline-codex-link:visited{color:var(--accent)}
+@media(max-width:479px){.browse{border:0;padding:0;margin:0}.sidebar-panel{padding:10px 14px}.browse .wiki-menu>summary{font:16px/1.5 Arial,sans-serif;margin:0;min-height:28px}.wiki-menu[open]>summary{margin-bottom:12px}.browse details>div{columns:auto}}
+
+</style></head><body><div id="reader" role="region" aria-label="Kyranda Codex"><p>Loading reader connection…</p></div><script>(() => {
+  // ui/dto.mjs
+  var alias = (value) => typeof value === "string" && /^r-[0-9a-f]{32}$/.test(value);
+  var text = (value, max = 6e3) => typeof value === "string" && value.length <= max && !/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(value);
+  function readerDto(value, request) {
+    if (!value || value.status !== "ready" || value.selectedEpisode !== request.episode || value.maximumEpisode !== (request.campaign === "main" ? 47 : 3) || !Array.isArray(value.entries) || value.entries.length > 250 || !Array.isArray(value.categories) || value.categories.length > 100) return null;
+    const entries = value.entries.map((e) => e && alias(e.slug) && text(e.title) && text(e.summary) && text(e.category, 80) ? { slug: e.slug, title: e.title, summary: e.summary, category: e.category } : null);
+    if (entries.some((e) => !e) || new Set(entries.map((e) => e.slug)).size !== entries.length || !value.categories.every((c) => text(c, 80))) return null;
+    let article = null;
+    if (request.slug) {
+      const a = value.article;
+      if (!a || a.slug !== request.slug || !entries.some((e) => e.slug === a.slug) || !text(a.title) || !text(a.category, 80) || !Array.isArray(a.sections) || a.sections.length > 100 || !Array.isArray(a.links) || a.links.length > 100) return null;
+      if (!a.sections.every((s) => s && text(s.heading) && text(s.text)) || !a.links.every((l) => l && alias(l.slug) && text(l.title) && entries.some((e) => e.slug === l.slug && e.title === l.title))) return null;
+      article = { slug: a.slug, title: a.title, category: a.category, sections: a.sections.map((s) => ({ heading: s.heading, text: s.text })), links: a.links.map((l) => ({ slug: l.slug, title: l.title })), inlineLinks: Array.isArray(a.inlineLinks) ? a.inlineLinks.slice(0, 200) : [], inlineLinkApproval: a.inlineLinkApproval };
+    } else if (value.article !== null) return null;
+    return { status: "ready", selectedEpisode: value.selectedEpisode, maximumEpisode: value.maximumEpisode, entries, categories: [...value.categories], article };
+  }
+  function reviewedPresentation(value) {
+    if (!value || !Array.isArray(value.facts) || value.facts.length > 100 || !value.facts.every((f) => f && text(f.label, 140) && text(f.text))) return { media: null, facts: [] };
+    const facts = value.facts.map((f) => ({ label: f.label, text: f.text }));
+    if (!value.media) return { media: null, facts };
+    const m = value.media;
+    if (!/^https:\/\/static\.wixstatic\.com\/media\/[a-zA-Z0-9_.~-]+$/.test(m.src || "") || !text(m.alt, 1000) || !text(m.caption, 1500) || !text(m.artistName, 200) || m.artistUrl && !/^https:\/\/[a-z0-9.-]+(?:\/[^\s]*)?$/.test(m.artistUrl)) return { media: null, facts };
+    return { facts, media: { src: m.src, alt: m.alt, caption: m.caption, artistName: m.artistName, artistUrl: m.artistUrl || "" } };
+  }
+
+  // launch/public-campaign-progress.mjs
+  var MAIN_PROGRESS_KEY = "kyranda-main-campaign-reader-episode-v1";
+  var PARENTAL_PROGRESS_KEY = "kyranda-parental-advisory-reader-episode-v1";
+  var SETTINGS = Object.freeze({
+    main: { maximum: 47, key: MAIN_PROGRESS_KEY },
+    parental: { maximum: 3, key: PARENTAL_PROGRESS_KEY }
+  });
+  var selected = (value, max) => {
+    if (typeof value !== "string" || !/^\d{1,5}$/.test(value)) return 1;
+    const n = Number(value);
+    return Number.isSafeInteger(n) ? Math.min(max, Math.max(1, n)) : 1;
+  };
+  var valid = (campaign, n) => Object.hasOwn(SETTINGS, campaign) && Number.isSafeInteger(n) && n >= 1 && n <= SETTINGS[campaign].maximum;
+  function createPublicCampaignProgress({ getItem, setItem } = {}) {
+    return {
+      async getSelection({ campaign, through = null } = {}) {
+        if (!Object.hasOwn(SETTINGS, campaign)) return null;
+        const rule = SETTINGS[campaign];
+        if (through !== null && through !== void 0 && through !== "")
+          return { campaign, episode: selected(through, rule.maximum), source: "url" };
+        let saved = null;
+        try {
+          if (typeof getItem === "function") saved = await getItem(rule.key);
+        } catch (_) {
+          saved = null;
+        }
+        return {
+          campaign,
+          episode: selected(saved, rule.maximum),
+          source: typeof saved === "string" ? "saved" : "default"
+        };
+      },
+      async commitEpisode({ campaign, episode } = {}) {
+        if (!valid(campaign, episode)) return false;
+        try {
+          if (typeof setItem !== "function") return false;
+          await setItem(SETTINGS[campaign].key, String(episode));
+          return true;
+        } catch (_) {
+          return false;
+        }
+      },
+      keyFor(campaign) {
+        return Object.hasOwn(SETTINGS, campaign) ? SETTINGS[campaign].key : null;
+      },
+      maximumFor(campaign) {
+        return Object.hasOwn(SETTINGS, campaign) ? SETTINGS[campaign].maximum : null;
+      }
+    };
+  }
+
+// Immutable presentation setting for this staging reader. Not a router/backend delivery switch.
+// Enabling in a future reviewed build is still insufficient without a valid per-article approval.
+const INLINE_LINKS_ENABLED = true; // DEDICATED TEST ASSET ONLY
+
+const aliasPattern = /^r-[0-9a-f]{32}$/;
+const word = character => Boolean(character && /[\p{L}\p{M}\p{N}\p{Pd}_'’]/u.test(character));
+function permanentUrl(slug, campaign, episode) {
+  if (!aliasPattern.test(slug || '') || !['main', 'parental'].includes(campaign) || !Number.isSafeInteger(episode) ||
+      episode < 1 || episode > (campaign === 'main' ? 47 : 3)) return null;
+  return `https://www.youvegottobecrittingme.com/wiki/${slug}?campaign=${campaign}&through=${episode}`;
+}
+function paragraphRanges(text) {
+  const ranges = []; let start = 0;
+  for (const match of text.matchAll(/\n\s*\n/g)) { ranges.push({ start, end: match.index }); start = match.index + match[0].length; }
+  ranges.push({ start, end: text.length }); return ranges;
+}
+const overlaps = (a, b) => a.start < b.end && b.start < a.end;
+const boundary = (text, start, end) => !word([...text.slice(Math.max(0, start - 2), start)].at(-1)) && !word([...text.slice(end, end + 2)][0]);
+const protectedRanges = text => [...text.matchAll(/https?:\/\/\S+|www\.\S+|[\w.+-]+@[\w.-]+\.[\w]+|`[^`]*`/g)].map(m => ({start:m.index,end:m.index+m[0].length}));
+
+// Relationships come only from current, validated backend article.links. No title inference adds an edge.
+function planArticleLinks(article, entries, policy = {}) {
+  const empty = Array.isArray(article?.sections) ? article.sections.map(() => []) : [];
+  if (policy.enabled !== true || !article || !Array.isArray(article.sections) || !article.sections.every(section => section && typeof section.text === 'string') ||
+      !Array.isArray(entries) || !Array.isArray(article.links)) return empty;
+  const approval = article.inlineLinkApproval;
+  const label = value => typeof value === 'string' && value.trim().length > 0 && value.length <= 200;
+  if (!approval || Array.isArray(approval) || approval.version !== 1 || approval.status !== 'approved' ||
+      !label(approval.manifestId) || !label(approval.reviewId) || approval.source !== article.slug ||
+      !['main', 'parental'].includes(policy.campaign) || approval.campaign !== policy.campaign ||
+      !Number.isSafeInteger(policy.episode) || policy.episode < 1 || policy.episode > (policy.campaign === 'main' ? 47 : 3) ||
+      approval.episode !== policy.episode || !Array.isArray(approval.targets) || approval.targets.length > 100 ||
+      !Array.isArray(approval.automaticTargets) || approval.automaticTargets.length !== 0 ||
+      new Set(approval.targets).size !== approval.targets.length || new Set(approval.automaticTargets).size !== approval.automaticTargets.length) return empty;
+  const approvedTargets = new Set(approval.targets);
+  if (approval.targets.some(slug => !aliasPattern.test(slug || '') || slug === article.slug ||
+      !entries.some(entry => entry.slug === slug)) ||
+      approval.automaticTargets.some(slug => !approvedTargets.has(slug))) return empty;
+  // Reviewed manual grants use visible directory targets independently of Related Articles.
+  // This planning-only view does not mutate article.links or its DTO validation.
+  const manualTargets = entries.filter(entry => approvedTargets.has(entry.slug)).map(entry => ({slug:entry.slug,title:entry.title}));
+  return planEligibleMentions({...article,links:manualTargets}, entries, approval.targets, []);
+}
+
+// Offline review primitive only. The reader UI always calls the guarded planArticleLinks above.
+function planEligibleMentions(article, entries, targetAliases, automaticAliases) {
+  const approvedTargets = new Set(targetAliases);
+  const sections = article.sections, available = new Map(entries.map(entry => [entry.slug, entry]));
+  const targets = new Map(), titleCounts = new Map();
+  for (const entry of entries) titleCounts.set(entry.title, (titleCounts.get(entry.title) || 0) + 1);
+  for (const link of article.links) {
+    if (approvedTargets.has(link.slug) && link.slug !== article.slug && aliasPattern.test(link.slug) && available.get(link.slug)?.title === link.title) targets.set(link.slug, link);
+  }
+  const result = sections.map(() => []), used = new Set(), manual = [];
+  // Overrides must be projected in the episode-filtered response, never shipped as a full static catalogue.
+  for (const item of Array.isArray(article.inlineLinks) ? article.inlineLinks.slice(0, 200) : []) {
+    if (!item || item.status !== 'approved' || typeof item.reviewId !== 'string' || !item.reviewId.trim() || item.reviewId.length > 200 ||
+        !Number.isSafeInteger(item.section) || !sections[item.section] || !targets.has(item.target) ||
+        !Number.isSafeInteger(item.start) || !Number.isSafeInteger(item.end) || item.start < 0 || item.end <= item.start ||
+        typeof item.expectedText !== 'string' || !item.expectedText || /[\r\n]/.test(item.expectedText)) continue;
+    const text = sections[item.section].text;
+    if (item.expectedText !== available.get(item.target)?.title) continue;
+    if (text.slice(item.start, item.end) !== item.expectedText || !boundary(text, item.start, item.end) || protectedRanges(text).some(range => overlaps(range,item)) ||
+        !paragraphRanges(text).some(p => p.start <= item.start && p.end >= item.end)) continue;
+    manual.push({ section: item.section, start: item.start, end: item.end, slug: item.target, manual: true });
+  }
+  // Conflicting manual approvals fail closed rather than silently choosing an interpretation.
+  for (const item of manual) {
+    if (manual.filter(other => other.slug === item.slug || (other.section === item.section && overlaps(other, item))).length !== 1) continue;
+    result[item.section].push(item); used.add(item.slug);
+  }
+  const reserved = new Set(manual.map(item => item.slug));
+  const candidates = [];
+  for (const [slug, target] of targets) {
+    if (!automaticAliases.includes(slug) || reserved.has(slug) || titleCounts.get(target.title) !== 1 || target.title.length < 3 || /[\r\n]/.test(target.title)) continue;
+    sections.forEach((section, index) => {
+      let from = 0, start; const protectedText = protectedRanges(section.text);
+      while ((start = section.text.indexOf(target.title, from)) !== -1) {
+        const end = start + target.title.length; from = end;
+        if (boundary(section.text, start, end) && !protectedText.some(range => overlaps(range,{start,end}))) {
+          candidates.push({ section: index, start, end, slug, manual: false }); break;
+        }
+      }
+    });
+  }
+  candidates.sort((a, b) => a.section - b.section || a.start - b.start || (b.end - b.start) - (a.end - a.start));
+  for (const item of candidates) {
+    if (used.has(item.slug) || result[item.section].some(other => overlaps(item, other))) continue;
+    result[item.section].push(item); used.add(item.slug);
+  }
+  result.forEach(items => items.sort((a, b) => a.start - b.start)); return result;
+}
+
+function appendLinkedParagraph(node, text, range, spans, state, activate) {
+  let position = range.start;
+  for (const span of spans.filter(item => item.start >= range.start && item.end <= range.end)) {
+    const href = permanentUrl(span.slug, state.campaign, state.episode); if (!href) continue;
+    node.append(document.createTextNode(text.slice(position, span.start)));
+    const a = document.createElement('a'); a.textContent = text.slice(span.start, span.end); a.href = href;
+    a.className = 'inline-codex-link'; a.target = '_blank'; a.rel = 'noopener noreferrer';
+    a.addEventListener('click', event => {
+      if (event.button === 0 && !event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey) { event.preventDefault(); activate(span.slug); }
+    });
+    node.append(a); position = span.end;
+  }
+  node.append(document.createTextNode(text.slice(position, range.end)));
+}
+
+function setupWikiNavigation({ root, bridge, onOpen, onCategory, onDirectory }) {
+  const q = selector => root.querySelector(selector), nav = q('.browse'), panel = q('.sidebar-panel'), menu = q('.wiki-menu');
+  const mq = matchMedia('(min-width: 480px)'); let serial = 0, page = 0, viewport = null, offset = 0;
+  const make = (tag, text, className) => { const node = document.createElement(tag); if (text !== undefined) node.textContent = text; if (className) node.className = className; return node; };
+  const action = (text, callback) => { const node = make('button', text); node.type = 'button'; node.addEventListener('click', callback); return node; };
+  const closeMobile = () => { if (!mq.matches) menu.open = false; };
+  function dock() {
+    if (!viewport) return;
+    const box = nav.getBoundingClientRect(), layout = q('.wiki-layout').getBoundingClientRect(), size = panel.getBoundingClientRect().height;
+    // Tall expanded navigation stays in page flow: never add a nested scroller.
+    const fits = size <= viewport.height - 24;
+    offset = fits ? Math.min(Math.max(0, -viewport.top + 12 - box.top), Math.max(0, layout.bottom - box.top - size)) : 0;
+    panel.style.setProperty('--dock-offset', `${Math.round(offset)}px`);
+    const active = [...root.querySelectorAll('.article-body h3[id]')].filter(h => h.getBoundingClientRect().top <= -viewport.top + 90).at(-1);
+    q('.sidebar-toc').querySelectorAll('a').forEach(a => { if (active && a.hash === '#' + active.id) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current'); });
+  }
+  function onViewport(event) {
+    const m = event.data;
+    if (!bridge || event.source !== window.parent || event.origin !== bridge.parentOrigin || m?.type !== 'codex-viewport' || m.version !== 1 ||
+        m.session !== bridge.session || !Number.isFinite(m.top) || Math.abs(m.top) > 5000000 || !Number.isFinite(m.height) || m.height < 1 || m.height > 20000) return;
+    viewport = { top: m.top, height: m.height }; dock();
+  }
+  const resize = () => { menu.open = mq.matches; dock(); };
+  const onToggle = () => {
+    const wasDocked = offset > 0; dock();
+    if (wasDocked && offset === 0 && menu.open) nav.scrollIntoView({ block: 'start' });
+  };
+  const observer = new ResizeObserver(dock); observer.observe(panel);
+  panel.addEventListener('toggle', onToggle, true); window.addEventListener('message', onViewport);
+  mq.addEventListener('change', resize); resize();
+  q('.all-link').addEventListener('click', () => { closeMobile(); onDirectory(); });
+  function clear() {
+    serial++; q('.article-links').replaceChildren(); q('.categories').replaceChildren(); q('.sidebar-toc').replaceChildren();
+    q('.toc-group').hidden = true; q('.nav-pages').replaceChildren(); q('.all-link').removeAttribute('aria-current');
+  }
+  function render(dto, state) {
+    clear(); const current = serial, snapshot = { campaign: state.campaign, episode: state.episode };
+    const activate = callback => { if (current === serial) { closeMobile(); callback(); } };
+    if (!state.slug && !state.category) q('.all-link').setAttribute('aria-current', 'page');
+    dto.categories.forEach(category => {
+      const li = make('li'), button = action(category, () => activate(() => onCategory(category)));
+      button.setAttribute('aria-pressed', String(category === state.category)); li.append(button); q('.categories').append(li);
+    });
+    const selected = dto.entries.findIndex(entry => entry.slug === state.slug), pageSize = 8;
+    page = selected >= 0 ? Math.floor(selected / pageSize) : Math.min(page, Math.max(0, Math.ceil(dto.entries.length / pageSize) - 1));
+    function directory() {
+      const list = q('.article-links'); list.replaceChildren(); q('.nav-pages').replaceChildren();
+      dto.entries.slice(page * pageSize, (page + 1) * pageSize).forEach(entry => {
+        const li = make('li'), a = make('a', entry.title); a.href = permanentUrl(entry.slug, snapshot.campaign, snapshot.episode);
+        a.target = '_blank'; a.rel = 'noopener noreferrer';
+        if (entry.slug === state.slug) a.setAttribute('aria-current', 'page');
+        a.addEventListener('click', event => {
+          if (event.button === 0 && !event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey) { event.preventDefault(); activate(() => onOpen(entry.slug)); }
+        }); li.append(a); list.append(li);
+      });
+      const pages = Math.ceil(dto.entries.length / pageSize);
+      if (pages > 1) {
+        const previous = action('Previous articles', () => { if (current !== serial) return; page--; directory(); });
+        const next = action('Next articles', () => { if (current !== serial) return; page++; directory(); });
+        previous.disabled = page === 0; next.disabled = page >= pages - 1;
+        q('.nav-pages').append(previous, make('span', `Page ${page + 1} of ${pages}`), next);
+      }
+      dock();
+    }
+    directory();
+    q('.toc-group').hidden = !dto.article?.sections.length;
+    dto.article?.sections.forEach((section, index) => {
+      const li = make('li'), a = make('a', section.heading); a.href = `#section-${index}`;
+      a.addEventListener('click', event => {
+        event.preventDefault(); if (current !== serial) return; closeMobile();
+        requestAnimationFrame(() => { const heading = q(`#section-${index}`); if (heading) { heading.focus({ preventScroll: true }); heading.scrollIntoView({ block: 'start' }); } });
+      }); li.append(a); q('.sidebar-toc').append(li);
+    });
+    dock();
+  }
+  return { render, clear, dispose() { clear(); observer.disconnect(); panel.removeEventListener('toggle', onToggle, true); window.removeEventListener('message', onViewport); mq.removeEventListener('change', resize); } };
+}
+
+  // ui/reader.mjs
+  var el = (tag, text2, cls) => {
+    const node = document.createElement(tag);
+    if (text2 !== void 0) node.textContent = text2;
+    if (cls) node.className = cls;
+    return node;
+  };
+  var alias2 = (s) => typeof s === "string" && /^r-[0-9a-f]{32}$/.test(s);
+  function createResponsiveReader({ root, read, present = null, progress, initial = {}, onRoute = () => {
+  }, synthetic = false, bridge = null }) {
+    let state = { campaign: initial.campaign === "parental" ? "parental" : "main", episode: 1, slug: alias2(initial.slug) ? initial.slug : "", search: "", category: "" };
+    let generation = 0, disposed = false, ready = null, searchTimer, settlement = Promise.resolve(), progressWrites = Promise.resolve();
+    root.innerHTML = `<a class="skip" href="#article-body">Skip to article</a>
+    <div class="notice" role="note"></div>
+    <header class="masthead"><div><p class="eyebrow">YOU'VE GOT TO BE CRITTING ME</p><h1 class="brand">Kyranda <span>Codex</span></h1><p class="tagline">An episode-aware campaign encyclopedia</p></div><span class="seal" aria-hidden="true">K</span></header>
+    <section class="toolbar" aria-label="Reader preferences"><label>Campaign<select id="campaign"><option value="main">Main Campaign</option><option value="parental">Parental Advisory</option></select></label><label>Last episode completed<select id="episode"></select></label><form role="search"><label for="search">Search the Codex</label><div class="search-wrap"><input id="search" type="search" placeholder="Search visible articles\u2026" autocomplete="off"><button type="submit" aria-label="Search">\u2315</button></div></form></section>
+    <div class="wiki-layout"><nav class="browse" aria-label="Codex navigation"><div class="sidebar-panel"><details class="wiki-menu"><summary>Wiki navigation</summary><div><button class="all-link">All articles</button><details class="nav-group toc-group" open hidden><summary>On this page</summary><ol class="sidebar-toc"></ol></details><details class="nav-group category-group"><summary>Categories</summary><ul class="categories"></ul></details><details class="nav-group directory-group" open><summary>Article directory</summary><ul class="article-links"></ul><div class="nav-pages" aria-live="polite"></div></details></div></details></div></nav>
+    <header class="article-heading"><div class="breadcrumbs"></div><p class="eyebrow category-name"></p><h2 class="article-title">Kyranda Codex</h2><p class="article-intro"></p></header>
+    <main id="article-body" class="article-body" tabindex="-1"><p>Loading selected content\u2026</p></main>
+    <aside class="infobox" aria-label="Article information"></aside><section class="related" aria-label="Related articles"></section></div>
+    <footer class="reader-footer"><p class="live" role="status" aria-live="polite">Loading selected content\u2026</p><p>Episode preferences control spoilers, not access to private material.</p></footer>`;
+    const q = (selector) => root.querySelector(selector), campaign = q("#campaign"), episode = q("#episode"), search = q("#search");
+    q(".notice").textContent = synthetic ? "SYNTHETIC PREVIEW \xB7 All entries, identities and episode events in this demonstration are invented." : "Kyranda Codex \xB7 Your selected episode controls story spoilers.";
+    const navigation = setupWikiNavigation({root, bridge, onOpen: slug => open(slug), onDirectory: () => directory(), onCategory: category => {
+      state.category = category; state.search = ''; search.value = ''; state.slug = ''; void load();
+    }});
+    const prefs = progress || createPublicCampaignProgress({ getItem: (key) => localStorage.getItem(key), setItem: (key, value) => localStorage.setItem(key, value) });
+    async function selectionFor(request) {
+      try {
+        return await prefs.getSelection(request);
+      } catch {
+        return null;
+      }
+    }
+    const max = () => state.campaign === "main" ? 47 : 3;
+    function episodes() {
+      episode.replaceChildren(...Array.from({ length: max() }, (_, i) => {
+        const o = el("option", `Episode ${i + 1}`);
+        o.value = String(i + 1);
+        return o;
+      }));
+      episode.value = String(state.episode);
+      campaign.value = state.campaign;
+    }
+    function action(text2, fn, cls) {
+      const b = el("button", text2, cls);
+      b.type = "button";
+      b.addEventListener("click", fn);
+      return b;
+    }
+    function route() {
+      onRoute({ campaign: state.campaign, episode: state.episode, slug: state.slug, intent: generation });
+    }
+    function neutral(status) {
+      ready = null; navigation.clear();
+      q(".article-title").textContent = "Kyranda Codex";
+      q(".category-name").textContent = "";
+      q(".article-intro").textContent = "";
+      q(".breadcrumbs").replaceChildren();
+      q(".article-body").replaceChildren(el("p", status === "loading" ? "Loading selected content\u2026" : "Content unavailable. Try another episode or return to the directory.", "state-message"));
+      q(".infobox").hidden = true;
+      q(".infobox").replaceChildren();
+      q(".related").replaceChildren();
+      q(".article-links").replaceChildren();
+      q(".categories").replaceChildren();
+      q(".live").textContent = status === "loading" ? "Loading selected content\u2026" : "Content unavailable.";
+      root.dataset.status = status;
+    }
+    function open(slug) {
+      if (!ready || !ready.entries.some((e) => e.slug === slug)) return;
+      state.slug = slug;
+      state.search = "";
+      state.category = "";
+      search.value = "";
+      void load({ focus: true });
+    }
+    function directory() {
+      state.slug = "";
+      state.search = "";
+      state.category = "";
+      search.value = "";
+      void load({ focus: true });
+    }
+    // Navigation owns the directory control.
+    function render(dto, decoration, focus) {
+      ready = dto;
+      root.dataset.status = "ready";
+      const article = dto.article, title = article?.title || "Article directory";
+      q(".breadcrumbs").replaceChildren(action("Codex", directory), el("span", ` / ${article ? article.category : "All articles"}`));
+      q(".category-name").textContent = article?.category || `${dto.entries.length} visible ${dto.entries.length === 1 ? "entry" : "entries"}`;
+      q(".article-title").textContent = title;
+      q(".article-intro").textContent = article ? dto.entries.find((e) => e.slug === article.slug)?.summary || "" : "Explore the people, places and stories available at your selected episode.";
+      navigation.render(dto, state);
+      const inlinePlan = planArticleLinks(article, dto.entries, {enabled:INLINE_LINKS_ENABLED,campaign:state.campaign,episode:state.episode}), renderGeneration = generation;
+      const body = q(".article-body");
+      body.replaceChildren();
+      if (article) {
+
+        article.sections.forEach((section, i) => {
+          const box = el("section");
+          const heading = el("h3", section.heading);
+          heading.id = `section-${i}`;
+          heading.tabIndex = -1;
+          box.append(heading);
+          for (const range of paragraphRanges(section.text)) {
+            const paragraph = el('p');
+            appendLinkedParagraph(paragraph, section.text, range, inlinePlan[i], state, slug => {
+              if (generation === renderGeneration && ready === dto) open(slug);
+            });
+            box.append(paragraph);
+          }
+          body.append(box);
+        });
+        if (!article.sections.length) body.append(el("p", "No reviewed sections are available at this episode."));
+      } else {
+        if (!dto.entries.length) body.append(el("p", "No articles match these filters at this episode.", "state-message"), action("Clear filters", directory));
+        const list = el("ul", void 0, "directory");
+        for (const entry of dto.entries) {
+          const li = el("li");
+          li.append(action(entry.title, () => open(entry.slug), "entry-title"), el("span", entry.category, "entry-category"), el("p", entry.summary));
+          list.append(li);
+        }
+        body.append(list);
+      }
+      const info = q(".infobox");
+      info.hidden = !article;
+      info.replaceChildren();
+      if (article) {
+        info.append(el("h3", article.title));
+        if (decoration.media) {
+          const figure = el("figure"), img = el("img");
+          img.src = decoration.media.src;
+          img.alt = decoration.media.alt;
+          img.loading = "lazy";
+          figure.append(img);
+          const caption = el("figcaption", decoration.media.caption);
+          if (decoration.media.artistName) {
+            const credit = decoration.media.artistUrl ? el("a", decoration.media.artistName) : el("span", decoration.media.artistName);
+            if (credit.tagName === "A") {
+              credit.href = decoration.media.artistUrl;
+              credit.target = "_blank";
+              credit.rel = "noopener noreferrer";
+            }
+            caption.append(el("br"), document.createTextNode("Art by "), credit);
+          }
+          figure.append(caption);
+          info.append(figure);
+        } else info.append(el("p", "No reviewed artwork supplied", "art-placeholder"));
+        const facts = el("dl");
+        for (const f of [{ label: "Category", text: article.category }, { label: "Campaign", text: state.campaign === "main" ? "Main Campaign" : "Parental Advisory" }, ...decoration.facts]) facts.append(el("dt", f.label), el("dd", f.text));
+        info.append(facts);
+      }
+      const related = q(".related");
+      related.replaceChildren();
+      if (article?.links.length) {
+        related.append(el("h3", "Related articles"));
+        const ul = el("ul");
+        for (const link of article.links) {
+          const li = el("li");
+          li.append(action(link.title, () => open(link.slug)));
+          ul.append(li);
+        }
+        related.append(ul);
+      }
+      q(".live").textContent = `${dto.entries.length} visible entries. Last episode completed: ${state.episode}.`;
+      if (focus) body.focus({ preventScroll: true });
+    }
+    async function load({ commit = false, focus = false, publishRoute = true } = {}) {
+      clearTimeout(searchTimer);
+      const token = ++generation;
+      const request = { ...state };
+      neutral("loading");
+      episodes();
+      if (publishRoute) route();
+      try {
+        if (commit) {
+          progressWrites = progressWrites.catch(() => {
+          }).then(() => token === generation && !disposed ? prefs.commitEpisode({ campaign: request.campaign, episode: request.episode }) : false);
+          await progressWrites;
+        }
+        if (token !== generation || disposed) return;
+        const raw = await read(request);
+        if (token !== generation || disposed) return;
+        const dto = readerDto(raw, request);
+        if (!dto) {
+          neutral("unavailable");
+          return;
+        }
+        let decoration = { media: null, facts: [] };
+        if (dto.article && present) {
+          try {
+            decoration = reviewedPresentation(await present({ campaign: request.campaign, episode: request.episode, slug: request.slug }));
+          } catch {
+          }
+        }
+        if (token !== generation || disposed) return;
+        render(dto, decoration, focus);
+
+      } catch {
+        if (token === generation && !disposed) neutral("unavailable");
+      }
+    }
+    episode.addEventListener("change", () => {
+      state.episode = Number(episode.value);
+      state.search = "";
+      state.category = "";
+      search.value = "";
+      void load({ commit: true });
+    });
+    campaign.addEventListener("change", () => {
+      const next = campaign.value, token = ++generation;
+      neutral("loading");
+      state.campaign = next;
+      state.slug = "";
+      state.search = "";
+      state.category = "";
+      search.value = "";
+      settlement = (async () => {
+        const selection = await selectionFor({ campaign: next });
+        if (token !== generation || disposed) return;
+        state.episode = selection?.episode || 1;
+        await load();
+      })();
+    });
+    search.addEventListener("input", () => {
+      ++generation;
+      neutral("loading");
+      clearTimeout(searchTimer);
+      state.slug = "";
+      state.search = search.value.slice(0, 120);
+      searchTimer = setTimeout(() => void load(), 180);
+    });
+    q("form").addEventListener("submit", (event) => {
+      event.preventDefault();
+      state.slug = "";
+      state.search = search.value.slice(0, 120);
+      void load();
+    });
+    async function start() {
+      const token = ++generation;
+      neutral("loading");
+      const selection = await selectionFor({ campaign: state.campaign, through: initial.through ?? null });
+      if (token !== generation || disposed) return;
+      state.episode = selection?.episode || 1;
+      await load({ publishRoute: false });
+    }
+    return { suspend() { ++generation; clearTimeout(searchTimer); neutral("loading"); root.querySelectorAll("button,input,select").forEach(node => { node.disabled = true; }); }, start, load, getState: () => ({ ...state }), async restore(next) { root.querySelectorAll("button,input,select").forEach(node => { node.disabled = false; }); search.value = "";
+      ++generation;
+      state = { ...state, campaign: next.campaign === "parental" ? "parental" : "main", slug: alias2(next.slug) ? next.slug : "", search: "", category: "" };
+      const token = generation;
+      neutral("loading");
+      const selection = await selectionFor({ campaign: state.campaign, through: next.through ?? null });
+      if (token !== generation || disposed) return;
+      state.episode = selection?.episode || 1;
+      await load({ publishRoute: false });
+    }, dispose() {
+      disposed = true;
+      ++generation;
+      clearTimeout(searchTimer);
+      navigation.dispose();
+      neutral("unavailable");
+    } };
+  }
+
+  // ui/iframe-entry.mjs
+  var session = null;
+  var parentOrigin = null;
+  var sequence = 0;
+  var reader = null;
+  var requests = /* @__PURE__ */ new Map();
+  var revision = 0, appliedRevision = -1, readerIntent = 0;
+  function cancelRequests() { for (const p of requests.values()) { clearTimeout(p.timer); p.reject(new Error("Reader location changed")); } requests.clear(); }
+  function rpc(action, payload) {
+    return new Promise((resolve, reject) => {
+      if (!session) {
+        reject(new Error("Reader connection unavailable"));
+        return;
+      }
+      const id = String(++sequence), timer = setTimeout(() => {
+        requests.delete(id);
+        reject(new Error("Reader connection timed out"));
+      }, 12e3);
+      requests.set(id, { resolve, reject, timer });
+      window.parent.postMessage({ type: "codex-request", version: 1, session, revision, intent: readerIntent, id, action, payload }, parentOrigin);
+    });
+  }
+  window.addEventListener("message", (event) => {
+    if (event.source !== window.parent) return;
+    const data = event.data;
+    if (data?.type === "codex-init" && data.version === 1 && !session && typeof data.session === "string") {
+      session = data.session;
+      revision = Number.isSafeInteger(data.revision) ? data.revision : 0; appliedRevision = revision;
+      parentOrigin = event.origin;
+      reader = createResponsiveReader({
+        root: document.querySelector("#reader"),
+        bridge: {session, parentOrigin},
+        read: (request) => rpc("read", request),
+      present: (request) => rpc("present", request),
+        initial: data.initial || {},
+        progress: { getSelection: (request) => rpc("selection", request), commitEpisode: (request) => rpc("commit", request) },
+        onRoute: (state) => { readerIntent = state.intent; window.parent.postMessage({ type: "codex-route", version: 1, session, revision, intent: readerIntent, state }, parentOrigin); }
+      });
+      reader.start();
+      return;
+    }
+    if (event.origin !== parentOrigin || data?.session !== session || data.version !== 1) return;
+    if (data.type === "codex-sync") {
+      if (!reader || !Number.isSafeInteger(data.revision) || data.revision < revision || !["loading","ready"].includes(data.phase)) return;
+      if (data.revision > revision) { revision = data.revision; readerIntent = 0; reader.suspend(); cancelRequests(); }
+      if (data.phase === "ready" && appliedRevision < revision) { appliedRevision = revision; void reader.restore(data.initial || {}); }
+      return;
+    }
+    if (data.type !== "codex-response" || data.revision !== revision) return;
+    const pending = requests.get(data.id);
+    if (!pending) return;
+    clearTimeout(pending.timer);
+    requests.delete(data.id);
+    data.ok ? pending.resolve(data.value) : pending.reject(new Error("Reader unavailable"));
+  });
+  window.parent.postMessage({ type: "codex-ready", version: 1 }, "*");
+  // Content-free check also works when Wix preserves this iframe on Back.
+  function checkLocation() { if (session && document.visibilityState !== "hidden") window.parent.postMessage({type:"codex-location-check",version:1,session},parentOrigin); }
+  const locationTimer = setInterval(checkLocation,250);
+  window.addEventListener("pageshow",checkLocation);
+  document.addEventListener("visibilitychange",checkLocation);
+  window.addEventListener("pagehide",event=>{ if (!event.persisted) { clearInterval(locationTimer); window.removeEventListener("pageshow",checkLocation); document.removeEventListener("visibilitychange",checkLocation); } });
+  setTimeout(() => {
+    if (!session) document.querySelector("#reader").textContent = "Reader connection unavailable. Please reload or return to the directory.";
+  }, 12e3);
+  window.addEventListener("message", (event) => {
+    if (event.source !== window.parent || event.origin !== parentOrigin || event.data?.session !== session || event.data.type !== "codex-measure") return;
+    const width = document.documentElement.clientWidth, parentWidth = event.data.parentWidth;
+    window.parent.postMessage({
+      type: "codex-host-report",
+      version: 1,
+      session,
+      width,
+      parentWidth,
+      responsive: Number.isFinite(parentWidth) && width >= parentWidth - 64 && width <= parentWidth + 4,
+      horizontalOverflow: document.documentElement.scrollWidth > width + 1
+    }, parentOrigin);
+  });
+})();
+</script><script>
+// Appended to the confirmed reader document. No renderer or security code changes.
+(() => {
+  let session, origin, sequence = 0, pending = 0, disposed = false, last = '';
+  const root = document.querySelector('#reader');
+  if (!root || !window.ResizeObserver) return; // Keep ordinary iframe scrolling.
+  function measure() {
+    pending = 0;
+    if (disposed || !session) return;
+    const height = Math.ceil(root.getBoundingClientRect().height) + 2;
+    const width = window.innerWidth;
+    const key = `${width}:${height}`;
+    if (!Number.isFinite(height) || height < 1 || key === last) return;
+    last = key;
+    window.parent.postMessage({type:'codex-content-height',version:1,session,
+      sequence:++sequence,width,height}, origin);
+  }
+  const schedule = () => {
+    if (!disposed && !pending) pending = requestAnimationFrame(measure);
+  };
+  function initialize(event) {
+    const m = event.data;
+    if (event.source !== window.parent || m?.type !== 'codex-init' || m.version !== 1 ||
+        typeof m.session !== 'string' || !m.session || m.session.length > 200) return;
+    if (session && (m.session !== session || event.origin !== origin)) return;
+    session = m.session; origin = event.origin; schedule();
+  }
+  const observer = new ResizeObserver(schedule);
+  observer.observe(root);
+  window.addEventListener('message', initialize);
+  window.addEventListener('resize', schedule);
+  root.addEventListener('load', schedule, true);
+  root.addEventListener('error', schedule, true);
+  root.addEventListener('toggle', schedule, true);
+  document.fonts?.ready.then(schedule);
+  function cleanup(event) {
+    if (event.persisted) return; // Retain observers across browser back/forward cache.
+    disposed = true;
+    observer.disconnect(); cancelAnimationFrame(pending);
+    window.removeEventListener('message', initialize);
+    window.removeEventListener('resize', schedule);
+    root.removeEventListener('load', schedule, true);
+    root.removeEventListener('error', schedule, true);
+    root.removeEventListener('toggle', schedule, true);
+    window.removeEventListener('pagehide', cleanup);
+    window.removeEventListener('pageshow', schedule);
+  }
+  window.addEventListener('pagehide', cleanup);
+  window.addEventListener('pageshow', schedule);
+})();
+
+</script></body></html>
