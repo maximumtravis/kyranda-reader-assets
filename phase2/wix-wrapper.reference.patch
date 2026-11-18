@@ -1,0 +1,30 @@
+--- a/backend/codexUnifiedPublic.web.js
++++ b/backend/codexUnifiedPublic.web.js
+@@ -1,5 +1,7 @@
+ // PREPARED PUBLIC WIX WRAPPER. DO NOT INSTALL OR ENABLE BEFORE PRODUCTION APPROVAL.
+ import {createFrozenContextualReader} from 'backend/codexContextualLinksReader';
++import {withEditorialAnnotations} from 'backend/codexEditorialAnnotations';
++import {editorialAnnotationConfig,readEditorialAnnotationSnapshot} from 'backend/codexEditorialAnnotationData';
+ import {Permissions,webMethod} from 'wix-web-module';
+ import {auth} from '@wix/essentials';
+ import {createUnifiedPublicRouteGateway} from 'backend/codexUnifiedGateway';
+@@ -20,13 +22,18 @@
+ const reader=createPublicReaderIntegration({readRoute:route});
+ // Production cutover preparation only: leave this OFF pending owner decision.
+ const contextualReader=createFrozenContextualReader({readReader:reader,enabled:false,executionScope:'production'});
++const phase2Reader=editorialAnnotationConfig.enabled &&
++  editorialAnnotationConfig.siteId===publicDeploymentConfig.siteId
++  ? withEditorialAnnotations({readReader:reader,siteId:editorialAnnotationConfig.siteId,
++    readSnapshot:readEditorialAnnotationSnapshot})
++  : contextualReader;
+ export const getUnifiedPublicCodex=webMethod(Permissions.Anyone,async request=>{
+   if(!PUBLIC_UNIFIED_ENDPOINT_ENABLED)return neutral();
+   try{return await route(request);}catch{return neutral();}
+ });
+ export const getUnifiedPublicReader=webMethod(Permissions.Anyone,async request=>{
+   if(!PUBLIC_UNIFIED_ENDPOINT_ENABLED)return emptyReader();
+-  try{return await contextualReader(request);}catch{return emptyReader();}
++  try{return await phase2Reader(request);}catch{return emptyReader();}
+ });
+ export const getUnifiedPublicPresentation=webMethod(Permissions.Anyone,async request=>{
+   const none={media:null,facts:[]};

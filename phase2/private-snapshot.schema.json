@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Kyranda editorial annotations private per-source snapshot v1",
+  "type": "object",
+  "required": ["version", "siteId", "records", "approvals"],
+  "additionalProperties": false,
+  "properties": {
+    "version": { "const": 1 },
+    "siteId": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "records": { "type": "array", "maxItems": 500, "items": { "$ref": "#/$defs/record" } },
+    "approvals": { "type": "array", "maxItems": 500, "items": { "$ref": "#/$defs/approval" } }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,139}$" },
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "alias": { "type": "string", "pattern": "^r-[0-9a-f]{32}$" },
+    "status": { "enum": ["pending", "approved", "revoked"] },
+    "episode": { "type": "integer", "minimum": 1, "maximum": 47 },
+    "offset": { "type": "integer", "minimum": 0, "maximum": 6000 },
+    "record": {
+      "type": "object",
+      "required": ["id", "kind", "campaign", "source", "section", "heading", "sectionSha256", "anchor", "reveal", "status"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "kind": { "enum": ["citation", "link"] },
+        "campaign": { "enum": ["main", "parental"] },
+        "source": { "$ref": "#/$defs/alias" },
+        "section": { "type": "integer", "minimum": 0, "maximum": 99 },
+        "heading": { "type": "string", "minLength": 1, "maxLength": 6000 },
+        "sectionSha256": { "$ref": "#/$defs/sha256" },
+        "anchor": { "type": "string", "minLength": 1, "maxLength": 6000 },
+        "reveal": { "$ref": "#/$defs/episode" },
+        "status": { "$ref": "#/$defs/status" },
+        "approvalId": { "$ref": "#/$defs/id" }
+      },
+      "allOf": [
+        { "if": { "properties": { "status": { "const": "approved" } } }, "then": { "required": ["approvalId"] } },
+        { "if": { "properties": { "campaign": { "const": "parental" } } },
+          "then": { "properties": { "reveal": { "maximum": 3 }, "episode": { "maximum": 3 } } } },
+        { "if": { "properties": { "kind": { "const": "citation" } } },
+          "then": {
+            "required": ["episode", "title", "seconds", "edition"],
+            "properties": {
+              "episode": { "$ref": "#/$defs/episode" },
+              "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+              "seconds": { "type": "integer", "minimum": 0, "maximum": 86399 },
+              "edition": { "const": "patreon-ad-free" }
+            }
+          },
+          "else": {
+            "required": ["target", "plainBodyVerified", "protectedRanges"],
+            "properties": {
+              "target": { "$ref": "#/$defs/alias" },
+              "plainBodyVerified": { "type": "boolean" },
+              "protectedRanges": {
+                "type": "array",
+                "maxItems": 100,
+                "items": {
+                  "type": "object",
+                  "required": ["start", "end"],
+                  "additionalProperties": false,
+                  "properties": { "start": { "$ref": "#/$defs/offset" }, "end": { "$ref": "#/$defs/offset" } }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "approval": {
+      "type": "object",
+      "required": ["id", "status", "recordSha256"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "status": { "$ref": "#/$defs/status" },
+        "recordSha256": { "$ref": "#/$defs/sha256" }
+      }
+    }
+  }
+}
