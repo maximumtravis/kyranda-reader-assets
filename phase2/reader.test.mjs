@@ -22,7 +22,7 @@ window.addEventListener('popstate', event => {
 });
 window.addEventListener('message', async ({data:m,origin,source}) => {
   if (origin !== location.origin || source !== frame.contentWindow) return;
-  if (m.type === 'codex-ready') send({type:'codex-init',revision,initial});
+  if (m.type === 'codex-ready') send({type:'codex-init',revision,initial:history.state});
   if (m.type === 'codex-content-height') frame.style.height = m.height + 'px';
   if (m.type === 'codex-route') {
     const {campaign,episode,slug} = m.state;
@@ -43,28 +43,32 @@ window.addEventListener('message', async ({data:m,origin,source}) => {
   }
   send({type:'codex-response',revision:m.revision,id:m.id,ok:true,value});
 });
+window.reconnectReader = () => { revision++; frame.src = '/reader?revision=' + revision; };
 frame.src = '/reader';
 </script>`;
 
 async function start() {
+  let revoked = false;
   const server = createServer(async (req, res) => {
     if (req.url === '/dto') {
       let body = '';
       for await (const chunk of req) body += chunk;
       res.setHeader('Content-Type', 'application/json');
-      res.end(JSON.stringify(await readAnnotated(JSON.parse(body))));
+      const dto = await readAnnotated(JSON.parse(body));
+      if (revoked && dto.article) delete dto.article.annotations;
+      res.end(JSON.stringify(dto));
     } else {
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
-      res.end(req.url === '/reader' ? html : host);
+      res.end(req.url.startsWith('/reader') ? html : host);
     }
   });
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
-  return server;
+  return { server, revoke: () => { revoked = true; } };
 }
 
 for (const viewport of [{ width: 1280, height: 800 }, { width: 320, height: 700 }]) {
   test('Chromium iframe and history at ' + viewport.width + ' px', async () => {
-    const server = await start();
+    const { server, revoke } = await start();
     let browser;
     try {
       browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium', args: ['--no-sandbox'] });
@@ -116,6 +120,19 @@ for (const viewport of [{ width: 1280, height: 800 }, { width: 320, height: 700 
       assert.equal(await frame.locator('#episode').inputValue(), '47');
       await page.goForward();
       await ready('Painted Harbor');
+      await page.goBack();
+      await ready('Fictional travelers');
+      revoke();
+      assert.equal(await frame.locator('.citation-markers button').count(), 2);
+      await page.goForward();
+      await ready('Painted Harbor');
+      await page.goBack();
+      await ready('Fictional travelers');
+      assert.equal(await frame.locator('.citation-markers button').count(), 0);
+      await page.evaluate(() => window.reconnectReader());
+      await ready('Fictional travelers');
+      assert.equal(await frame.locator('#episode').inputValue(), '47');
+      assert.equal(await frame.locator('.citation-markers button').count(), 0);
 
       await frame.locator('#campaign').selectOption('parental');
       await ready('Article directory');

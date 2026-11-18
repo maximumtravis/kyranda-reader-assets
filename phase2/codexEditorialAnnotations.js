@@ -42,6 +42,42 @@ function placement(article, r) {
   return { section: r.section, start, end };
 }
 
+// Translate only output of the existing trusted decorator. Its review identifiers
+// are checked for envelope consistency and never included in Phase 2 responses.
+function legacyLinks(dto, request) {
+  const article = dto.article;
+  const grant = article.inlineLinkApproval;
+  if (grant?.version !== 1 || grant.status !== 'approved' || grant.source !== article.slug ||
+      grant.campaign !== request.campaign || grant.episode !== request.episode ||
+      !label(grant.manifestId, 200) || !label(grant.reviewId, 200) ||
+      !Array.isArray(grant.targets) || grant.targets.length > 100 ||
+      !Array.isArray(grant.automaticTargets) || grant.automaticTargets.length ||
+      !Array.isArray(article.inlineLinks) || article.inlineLinks.length > 100) return [];
+  const visible = new Map(dto.entries.map(entry => [entry.slug, entry.title]));
+  const items = [];
+  for (const item of article.inlineLinks) {
+    if (item?.status !== 'approved' || item.reviewId !== grant.reviewId ||
+        !matches(item.target, ALIAS) || item.target === article.slug ||
+        !grant.targets.includes(item.target) || !label(item.expectedText, 6000) ||
+        visible.get(item.target) !== item.expectedText ||
+        !Number.isSafeInteger(item.section) || item.section < 0 ||
+        !Number.isSafeInteger(item.start) || item.start < 0 ||
+        item.end !== item.start + item.expectedText.length ||
+        article.sections[item.section]?.text.slice(item.start, item.end) !== item.expectedText) continue;
+    const { section, start, end, target } = item;
+    items.push({ kind: 'link', section, start, end, target });
+  }
+  return items.filter(item => !items.some(other => other !== item && overlaps(item, other)));
+}
+
+function overlaps(a, b) {
+  return a.section === b.section && a.start < b.end && a.end > b.start;
+}
+
+function presentation(request, items) {
+  return { version: 1, campaign: request.campaign, through: request.episode, source: request.slug, items };
+}
+
 function project(dto, request, snapshot, siteId) {
   const { campaign, episode: through, slug } = request;
   const maximum = MAXIMUM[campaign];
@@ -84,13 +120,12 @@ function project(dto, request, snapshot, siteId) {
     if (position) items.push({ ...position, ...publicFields });
   }
   const eligible = items.filter(item => item.kind !== 'link' || !items.some(other =>
-    other !== item && other.kind === 'link' && other.section === item.section &&
-    other.start < item.end && other.end > item.start));
+    other !== item && other.kind === 'link' && overlaps(item, other)));
   const annotations = { version: 1, campaign, through, source: slug, items: eligible };
   return eligible.length && Buffer.byteLength(JSON.stringify(annotations), 'utf8') <= 32768 ? annotations : null;
 }
 
-// readReader must be the existing trusted reader, with a complete eligible directory
+// readReader must be the existing trusted contextual reader, with a complete eligible directory
 // for article reads. readSnapshot must read current private state scoped to this site,
 // campaign and source alias. Never pass browser-supplied DTOs, records or receipts.
 export function withEditorialAnnotations({ readReader, readSnapshot, siteId }) {
@@ -100,18 +135,33 @@ export function withEditorialAnnotations({ readReader, readSnapshot, siteId }) {
     // Keep established article data, while omitting legacy editorial metadata.
     const { slug, title, category, sections, links } = dto.article;
     const article = { slug, title, category, sections, links };
-    let annotations = null;
+    let legacy = [], next = [];
     try {
       if (label(siteId, 200) && dto.status === 'ready' && slug === request?.slug &&
           matches(slug, ALIAS) && Object.hasOwn(MAXIMUM, request.campaign) &&
           episode(request.episode, MAXIMUM[request.campaign]) &&
           request.episode === dto.selectedEpisode && dto.entries?.some(e => e.slug === slug)) {
         const scope = { siteId, campaign: request.campaign, source: slug };
-        annotations = project({ ...dto, article }, request, await readSnapshot(scope), siteId);
+        legacy = legacyLinks(dto, request);
+        next = project({ ...dto, article }, request, await readSnapshot(scope), siteId)?.items ?? [];
       }
     } catch {
       // A private store outage leaves the base reader usable.
     }
-    return { ...dto, article: annotations ? { ...article, annotations } : article };
+    // Existing grants win conflicts without widening either approval's scope.
+    const items = [...legacy, ...next.filter(item => item.kind !== 'link' ||
+      !legacy.some(old => overlaps(old, item)))];
+    const withinBudget = items.length <= 500 &&
+      Buffer.byteLength(JSON.stringify(presentation(request, items)), 'utf8') <= 32768;
+    const selected = withinBudget ? items : legacy;
+    return { ...dto, article: selected.length ?
+      { ...article, annotations: presentation(request, selected) } : article };
   };
+}
+
+// A disabled or differently scoped release retains the exact legacy contract.
+export function selectEditorialReader({ contextualReader, deploymentSiteId, config, readSnapshot }) {
+  return config?.enabled === true && label(deploymentSiteId, 200) && config.siteId === deploymentSiteId
+    ? withEditorialAnnotations({ readReader: contextualReader, siteId: deploymentSiteId, readSnapshot })
+    : contextualReader;
 }
