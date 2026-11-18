@@ -81,6 +81,12 @@ for (const viewport of [{ width: 1280, height: 800 }, { width: 320, height: 700 
       const ready = async title => frame.locator('#reader[data-status=ready] .article-title')
         .filter({ hasText: title }).waitFor({ timeout: 7000 });
       const height = () => page.locator('iframe').evaluate(el => el.clientHeight);
+      const waitForMeasuredHeight = () => page.waitForFunction(() => {
+        const frame = document.querySelector('iframe');
+        const doc = frame.contentDocument;
+        return doc.documentElement.scrollHeight <= frame.clientHeight &&
+          Math.abs(doc.querySelector('#reader').getBoundingClientRect().height - frame.clientHeight) < 4;
+      });
       await ready('Fictional travelers');
       assert.equal(await frame.locator('.infobox dd').last().textContent(), 'Travelers');
       assert.equal(await frame.locator('.citation-markers button').count(), 2);
@@ -94,12 +100,7 @@ for (const viewport of [{ width: 1280, height: 800 }, { width: 320, height: 700 
         nodes.map(node => node.getBoundingClientRect().top));
       assert.equal(markerY[0], markerY[1]);
       assert.ok(await frame.locator('html').evaluate(el => el.scrollWidth <= el.clientWidth));
-      await page.waitForFunction(() => {
-        const frame = document.querySelector('iframe');
-        const doc = frame.contentDocument;
-        return doc.documentElement.scrollHeight <= frame.clientHeight &&
-          Math.abs(doc.querySelector('#reader').getBoundingClientRect().height - frame.clientHeight) < 4;
-      });
+      await waitForMeasuredHeight();
       const expanded = await height();
       await first.click();
       await details.waitFor({ state: 'hidden' });
@@ -108,6 +109,7 @@ for (const viewport of [{ width: 1280, height: 800 }, { width: 320, height: 700 
       await frame.locator('#episode').selectOption('47');
       await ready('Fictional travelers');
       assert.equal(await frame.locator('.citation-markers button').count(), 2);
+      await waitForMeasuredHeight();
       const tall = await height();
       const link = frame.locator('.inline-codex-link');
       assert.match(await link.getAttribute('href'), /campaign=main&through=47$/);
