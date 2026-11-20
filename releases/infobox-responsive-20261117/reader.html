@@ -29,7 +29,7 @@
   var alias = (value) => typeof value === "string" && /^r-[0-9a-f]{32}$/.test(value);
   var text = (value, max = 6e3) => typeof value === "string" && value.length <= max && !/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(value);
   function readerDto(value, request) {
-    if (!value || value.status !== "ready" || value.selectedEpisode !== request.episode || value.maximumEpisode !== (request.campaign === "main" ? 47 : 3) || !Array.isArray(value.entries) || value.entries.length > 250 || !Array.isArray(value.categories) || value.categories.length > 100) return null;
+    if (!value || value.status !== "ready" || value.selectedEpisode !== request.episode || !Number.isSafeInteger(value.maximumEpisode) || value.maximumEpisode < (request.campaign === "main" ? 47 : 3) || value.maximumEpisode < request.episode || !Array.isArray(value.entries) || value.entries.length > 250 || !Array.isArray(value.categories) || value.categories.length > 100) return null;
     const entries = value.entries.map((e) => e && alias(e.slug) && text(e.title) && text(e.summary) && text(e.category, 80) ? { slug: e.slug, title: e.title, summary: e.summary, category: e.category } : null);
     if (entries.some((e) => !e) || new Set(entries.map((e) => e.slug)).size !== entries.length || !value.categories.every((c) => text(c, 80))) return null;
     let article = null;
@@ -109,7 +109,7 @@ const aliasPattern = /^r-[0-9a-f]{32}$/;
 const word = character => Boolean(character && /[\p{L}\p{M}\p{N}\p{Pd}_'’]/u.test(character));
 function permanentUrl(slug, campaign, episode) {
   if (!aliasPattern.test(slug || '') || !['main', 'parental'].includes(campaign) || !Number.isSafeInteger(episode) ||
-      episode < 1 || episode > (campaign === 'main' ? 47 : 3)) return null;
+      episode < 1 || episode > (SETTINGS[campaign]?.maximum || 0)) return null;
   return `https://www.youvegottobecrittingme.com/wiki/${slug}?campaign=${campaign}&through=${episode}`;
 }
 function paragraphRanges(text) {
@@ -131,7 +131,7 @@ function planArticleLinks(article, entries, policy = {}) {
   if (!approval || Array.isArray(approval) || approval.version !== 1 || approval.status !== 'approved' ||
       !label(approval.manifestId) || !label(approval.reviewId) || approval.source !== article.slug ||
       !['main', 'parental'].includes(policy.campaign) || approval.campaign !== policy.campaign ||
-      !Number.isSafeInteger(policy.episode) || policy.episode < 1 || policy.episode > (policy.campaign === 'main' ? 47 : 3) ||
+      !Number.isSafeInteger(policy.episode) || policy.episode < 1 || policy.episode > (SETTINGS[policy.campaign]?.maximum || 0) ||
       approval.episode !== policy.episode || !Array.isArray(approval.targets) || approval.targets.length > 100 ||
       !Array.isArray(approval.automaticTargets) || approval.automaticTargets.length !== 0 ||
       new Set(approval.targets).size !== approval.targets.length || new Set(approval.automaticTargets).size !== approval.automaticTargets.length) return empty;
@@ -321,7 +321,19 @@ function setupWikiNavigation({ root, bridge, onOpen, onCategory, onDirectory }) 
         return null;
       }
     }
-    const max = () => state.campaign === "main" ? 47 : 3;
+    // Probe a historical directory using the public reader contract before
+    // interpreting an Episode 48 URL. The backend, never the URL, grants 48.
+    async function refreshAuthorizedMaximum(campaignName) {
+      const baseline = campaignName === "main" ? 47 : 3;
+      SETTINGS[campaignName].maximum = baseline;
+      try {
+        const request = { campaign: campaignName, episode: baseline, slug: "", search: "", category: "" };
+        const dto = readerDto(await read(request), request);
+        if (dto && dto.maximumEpisode >= baseline)
+          SETTINGS[campaignName].maximum = dto.maximumEpisode;
+      } catch { /* Retain the safe historical maximum. */ }
+    }
+    const max = () => SETTINGS[state.campaign]?.maximum || 1;
     function episodes() {
       episode.replaceChildren(...Array.from({ length: max() }, (_, i) => {
         const o = el("option", `Episode ${i + 1}`);
@@ -475,6 +487,10 @@ function setupWikiNavigation({ root, bridge, onOpen, onCategory, onDirectory }) 
           neutral("unavailable");
           return;
         }
+        // The verified backend response is the only source of a larger maximum.
+        // No URL, storage value, or message from the embedding parent can grant it.
+        SETTINGS[request.campaign].maximum = dto.maximumEpisode;
+        episodes();
         let decoration = { media: null, facts: [] };
         if (dto.article && present) {
           try {
@@ -528,16 +544,28 @@ function setupWikiNavigation({ root, bridge, onOpen, onCategory, onDirectory }) 
     async function start() {
       const token = ++generation;
       neutral("loading");
+      await refreshAuthorizedMaximum(state.campaign);
+      if (token !== generation || disposed) return;
       const selection = await selectionFor({ campaign: state.campaign, through: initial.through ?? null });
       if (token !== generation || disposed) return;
       state.episode = selection?.episode || 1;
       await load({ publishRoute: false });
+      if (initial.through != null && !disposed && ready) {
+        const completedGeneration=generation;
+        const verified = await selectionFor({campaign:state.campaign,through:initial.through});
+        if (completedGeneration===generation && verified && verified.episode !== state.episode) {
+          state.episode = verified.episode;
+          await load({publishRoute:false});
+        }
+      }
     }
     return { suspend() { ++generation; clearTimeout(searchTimer); neutral("loading"); root.querySelectorAll("button,input,select").forEach(node => { node.disabled = true; }); }, start, load, getState: () => ({ ...state }), async restore(next) { root.querySelectorAll("button,input,select").forEach(node => { node.disabled = false; }); search.value = "";
       ++generation;
       state = { ...state, campaign: next.campaign === "parental" ? "parental" : "main", slug: alias2(next.slug) ? next.slug : "", search: "", category: "" };
       const token = generation;
       neutral("loading");
+      await refreshAuthorizedMaximum(state.campaign);
+      if (token !== generation || disposed) return;
       const selection = await selectionFor({ campaign: state.campaign, through: next.through ?? null });
       if (token !== generation || disposed) return;
       state.episode = selection?.episode || 1;
