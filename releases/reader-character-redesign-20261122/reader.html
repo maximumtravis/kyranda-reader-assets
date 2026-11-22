@@ -254,6 +254,25 @@ function addMalciusInlineLinks(article, plan, connections) {
   }
   return result;
 }
+// Public character-card facts. Wix-approved presentation values always win.
+// No age, hometown, alias, relationship, or private sheet data is inferred.
+const STARTING_CHARACTER_FACTS = Object.freeze({
+  'r-1b73c85c437fc5770f1277baee82e0a5': [
+    {label:'Species',text:'Goliath',episode:1},{label:'Class',text:'Fighter',episode:1},{label:'Portrayed by',text:'Morgan Gibson',episode:1}
+  ],
+  'r-49b98702f12097407bc64992859d7c6b': [
+    {label:'Species',text:'Dwarf',episode:1},{label:'Class',text:'Druid',episode:1},{label:'Portrayed by',text:'Nick Miller',episode:1}
+  ],
+  'r-3e5b9615896e0bf388a2e21eb445d6a6': [
+    {label:'Species',text:'Half-elf',episode:1},{label:'Class',text:'Rogue',episode:1},{label:'Portrayed by',text:'Bryce Shearer',episode:1}
+  ]
+});
+function startingCharacterFacts(article, existing, campaign, episode, maximumEpisode) {
+  if (campaign !== 'main' || !article || !/player character/i.test(article.category)) return existing;
+  const fallback = STARTING_CHARACTER_FACTS[article.slug] || [];
+  const present = new Set(existing.map(f => ({ancestry:'species',cast:'portrayed by',player:'portrayed by'})[f.label.toLowerCase()] || f.label.toLowerCase()));
+  return [...existing, ...fallback.filter(f => f.episode <= episode && f.episode <= maximumEpisode && !present.has(f.label.toLowerCase())).map(({label,text}) => ({label,text}))];
+}
 // Presentation-only grouping for the reviewed Malcius reference page. The
 // original sections and indices remain untouched for source-linked offsets.
 const MALCIUS_PUBLIC_ALIAS = 'r-c70d253c60e544348c8c929136c8776d';
@@ -561,7 +580,7 @@ function setupWikiNavigation({ root, bridge, onOpen, onCategory, onDirectory }) 
         const character = /player character/i.test(article.category);
         const displayName = label => ({ancestry:'Species',group:'Affiliation',home:'Hometown',cast:'Portrayed by'})[label.toLowerCase()] || label;
         const characterFields = ['species','ancestry','class','age','affiliation','group','hometown','home','portrayed by','cast','player'];
-        const publicFacts = inventory.regular.filter(f => !/^(?:alias(?:es)?|connection(?:s)?)$/i.test(f.label));
+        const publicFacts = startingCharacterFacts(article, inventory.regular.filter(f => !/^(?:alias(?:es)?|connection(?:s)?)$/i.test(f.label)), state.campaign, state.episode, dto.maximumEpisode);
         const ordered = character ? publicFacts.filter(f => characterFields.includes(f.label.toLowerCase())) : publicFacts;
         for (const f of (ordered.length ? ordered : [{ label: "Category", text: article.category }, { label: "Campaign", text: state.campaign === "main" ? "Main Campaign" : "Parental Advisory" }])) facts.append(el("dt", displayName(f.label)), el("dd", f.text));
         info.append(facts);
