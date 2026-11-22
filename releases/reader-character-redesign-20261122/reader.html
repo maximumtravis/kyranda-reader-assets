@@ -283,11 +283,37 @@ const MALCIUS_STORY_ARCS = [
   {start:16,end:22,title:'The Trials and His Music'},
   {start:23,end:25,title:'Onward to Pendilor'}
 ];
+// Presentation-only story arcs. Index boundaries follow the approved,
+ // chronological biography sections. No episode numbers or hidden text are
+ // inferred, and a group is shown only when it contains a visible chapter.
+const CHARACTER_STORY_ARCS = Object.freeze({
+  'r-1b73c85c437fc5770f1277baee82e0a5': [
+    {start:0,end:4,title:'A Fighter in Sestone'},
+    {start:5,end:8,title:'Returning with Solsta'},
+    {start:9,end:11,title:'Margaret Smith and the Festival'},
+    {start:12,end:14,title:'Jeremiah and the Hall of the Fallen'}
+  ],
+  'r-49b98702f12097407bc64992859d7c6b': [
+    {start:0,end:4,title:'A Druid Searching for Answers'},
+    {start:5,end:8,title:'A Familiar Missing Tooth'},
+    {start:9,end:13,title:'Moonstone and Its Aftermath'},
+    {start:14,end:16,title:'New Forms and Moonstones'}
+  ],
+  'r-3e5b9615896e0bf388a2e21eb445d6a6': [
+    {start:0,end:4,title:'The Masked Adventurer'},
+    {start:5,end:10,title:'The Presence in the Rat'},
+    {start:11,end:14,title:'The Mask Begins to Move'},
+    {start:15,end:19,title:'Stolen Equipment'},
+    {start:20,end:21,title:'Protecting the Valuables'}
+  ]
+});
 function storyArcGroups(article) {
-  if (!article || article.slug !== MALCIUS_PUBLIC_ALIAS) return null;
+  if (!article || !Array.isArray(article.sections)) return null;
   const biography=article.sections.map((section,index)=>({section,index})).filter(x=>!isInventoryHistory(x.section));
-  if (biography.length > 26 || biography.some(x=>x.index>25)) return null;
-  return MALCIUS_STORY_ARCS.map(arc=>({...arc,chapters:biography.filter(x=>x.index>=arc.start&&x.index<=arc.end)})).filter(arc=>arc.chapters.length);
+  if (article.slug !== MALCIUS_PUBLIC_ALIAS && biography.length < 4) return null;
+  const arcs=article.slug === MALCIUS_PUBLIC_ALIAS ? MALCIUS_STORY_ARCS : CHARACTER_STORY_ARCS[article.slug];
+  if (!arcs || biography.some(x=>x.index>arcs[arcs.length-1].end)) return null;
+  return arcs.map(arc=>({...arc,chapters:biography.filter(x=>x.index>=arc.start&&x.index<=arc.end)})).filter(arc=>arc.chapters.length);
 }
 function inventoryPresentation(facts) {
   const regular = [], documented = [], previous = [];
@@ -503,7 +529,7 @@ function setupWikiNavigation({ root, bridge, onOpen, onCategory, onDirectory }) 
           }
         };
         const arcs=storyArcGroups(article);
-        if (biography.length > 1) body.append(el('p',arcs?'Explore five story arcs. Open an arc to see its episode-by-episode history.':'Select a chapter to expand its story. Chapters stay in chronological order.','bio-intro'));
+        if (biography.length > 1) body.append(el('p',arcs?`Explore ${arcs.length} story ${arcs.length === 1 ? 'arc' : 'arcs'}. Open an arc to see its chapters in order.`:'Select a chapter to expand its story. Chapters stay in chronological order.','bio-intro'));
         const makeChapter=({section,i},index,openFirst) => {
           const chapter = el('details',void 0,'bio-chapter');
           chapter.open = openFirst && index === 0;
