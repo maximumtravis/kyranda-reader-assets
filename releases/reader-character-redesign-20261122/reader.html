@@ -216,6 +216,44 @@ function appendLinkedParagraph(node, text, range, spans, state, activate) {
 }
 
 function isInventoryHistory(section) { return /^inventory\s+history\s*:/i.test(section?.heading || ''); }
+// Owner-reviewed Malcius connections, each limited by the first episode
+// containing its mention. The live directory is the second visibility gate.
+const MALCIUS_CONNECTIONS = Object.freeze([
+  {slug:'r-1b73c85c437fc5770f1277baee82e0a5',title:'Sefi',episode:1},
+  {slug:'r-d40fca3a358f0b00a832c909e6ac9d4b',title:'Sestone',episode:1},
+  {slug:'r-db0bf6dfac3abf47f7b0815604a08ac3',title:'Aelmor Island',episode:3},
+  {slug:'r-6fba8ef85c374a295c7c602d413916c3',title:'Beckinsdale',episode:22},
+  {slug:'r-4bc7e6902defdbe1766f6300119e3430',title:'Pendilor',episode:43}
+]);
+function malciusConnections(article, entries, episode, campaign) {
+  if (!article || article.slug !== 'r-c70d253c60e544348c8c929136c8776d' || campaign !== 'main') return [];
+  return MALCIUS_CONNECTIONS.filter(item => item.episode <= episode &&
+    entries.some(entry => entry.slug === item.slug && entry.title === item.title));
+}
+function addMalciusInlineLinks(article, plan, connections) {
+  if (!article || !connections.length) return plan;
+  const result = plan.map(spans => [...spans]);
+  const used = new Set(result.flat().map(span => span.slug));
+  for (const connection of connections) {
+    if (used.has(connection.slug)) continue;
+    for (let i = 0; i < article.sections.length; i++) {
+      const content = article.sections[i].text;
+      let from = 0, start;
+      while ((start = content.indexOf(connection.title, from)) !== -1) {
+        const end = start + connection.title.length; from = end;
+        const candidate = {start,end,slug:connection.slug};
+        if (!boundary(content,start,end) ||
+            protectedRanges(content).some(range => overlaps(range,candidate)) ||
+            result[i].some(span => overlaps(span,candidate)) ||
+            !paragraphRanges(content).some(range => range.start <= start && range.end >= end)) continue;
+        result[i].push(candidate); result[i].sort((a,b)=>a.start-b.start);
+        used.add(connection.slug); break;
+      }
+      if (used.has(connection.slug)) break;
+    }
+  }
+  return result;
+}
 // Presentation-only grouping for the reviewed Malcius reference page. The
 // original sections and indices remain untouched for source-linked offsets.
 const MALCIUS_PUBLIC_ALIAS = 'r-c70d253c60e544348c8c929136c8776d';
@@ -428,7 +466,8 @@ function setupWikiNavigation({ root, bridge, onOpen, onCategory, onDirectory }) 
       q(".article-title").textContent = title;
       q(".article-intro").textContent = article ? dto.entries.find((e) => e.slug === article.slug)?.summary || "" : "Explore the people, places and stories available at your selected episode.";
       navigation.render(dto, state, decoration.facts.some(f => /^inventory\s*:/i.test(f.label)));
-      const inlinePlan = planArticleLinks(article, dto.entries, {enabled:INLINE_LINKS_ENABLED,campaign:state.campaign,episode:state.episode}), renderGeneration = generation;
+      const curatedLinks = malciusConnections(article, dto.entries, state.episode, state.campaign);
+      const inlinePlan = addMalciusInlineLinks(article, planArticleLinks(article, dto.entries, {enabled:INLINE_LINKS_ENABLED,campaign:state.campaign,episode:state.episode}), curatedLinks), renderGeneration = generation;
       const body = q(".article-body");
       body.replaceChildren();
       if (article) {
@@ -533,7 +572,7 @@ function setupWikiNavigation({ root, bridge, onOpen, onCategory, onDirectory }) 
             for (const a of visibleAliases) list.append(el('li',a.name));
             section.append(list); info.append(section);
           }
-          const connections = article.links.filter(l => dto.entries.some(e => e.slug === l.slug && e.title === l.title));
+          const connections = [...article.links.filter(l => dto.entries.some(e => e.slug === l.slug && e.title === l.title)), ...curatedLinks.filter(l => !article.links.some(existing => existing.slug === l.slug))];
           if (connections.length) {
             const section = el('section',void 0,'info-subsection'), list = el('ul'); section.append(el('h4','Connections'));
             for (const connection of connections.slice(0,8)) {
@@ -548,10 +587,11 @@ function setupWikiNavigation({ root, bridge, onOpen, onCategory, onDirectory }) 
       }
       const related = q(".related");
       related.replaceChildren();
-      if (article?.links.length) {
+      const relatedLinks = article ? [...article.links.filter(link => dto.entries.some(entry => entry.slug === link.slug && entry.title === link.title)), ...curatedLinks.filter(link => !article.links.some(existing => existing.slug === link.slug))] : [];
+      if (relatedLinks.length) {
         related.append(el("h3", "Related articles"));
         const ul = el("ul");
-        for (const link of article.links.filter(link => dto.entries.some(entry => entry.slug === link.slug && entry.title === link.title))) {
+        for (const link of relatedLinks) {
           const li = el("li"), anchor = el('a',link.title);
           anchor.href = permanentUrl(link.slug,state.campaign,state.episode);
           anchor.target = '_blank'; anchor.rel = 'noopener noreferrer';
