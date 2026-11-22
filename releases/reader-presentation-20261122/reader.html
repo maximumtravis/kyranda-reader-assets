@@ -218,7 +218,9 @@ function inventoryPresentation(facts) {
     if (!match) { regular.push(fact); continue; }
     const description = fact.text.replace(/^\s*(?:documented|current|former|previous)\s*:\s*/i, '').trim();
     const entry = {name:match[1].trim(),description};
-    if (/^\s*(?:former|previous)\s*:/i.test(fact.text) || /\b(?:no longer|lost|discarded|sold|formerly held)\b/i.test(fact.text)) previous.push(entry);
+    const retained = /\b(?:keeps?|retains?|still (?:has|holds|carries|possesses))\b/i.test(fact.text);
+    const transferred = /\b(?:gives?|gave|handed|traded|sold|lost|discarded|gone|no longer (?:held|carried|possessed)|formerly held)\b/i.test(fact.text);
+    if (/^\s*(?:former|previous)\s*:/i.test(fact.text) || (!retained && transferred)) previous.push(entry);
     else documented.push(entry);
   }
   return {regular,documented,previous};
