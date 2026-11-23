@@ -725,7 +725,7 @@ function setupWikiNavigation({ root, bridge, onOpen, onCategory, onDirectory }) 
       const related = q(".related");
       related.replaceChildren();
       const relatedLinks = article ? [...article.links.filter(link => dto.entries.some(entry => entry.slug === link.slug && entry.title === link.title)), ...curatedLinks.filter(link => !article.links.some(existing => existing.slug === link.slug))] : [];
-      if (relatedLinks.length) {
+      if (relatedLinks.length && !/player character/i.test(article?.category || '')) {
         related.append(el("h3", "Related articles"));
         const ul = el("ul");
         for (const link of relatedLinks) {
