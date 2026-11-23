@@ -27,7 +27,7 @@
 /* Narrow screens need a single readable column for labels and values. */
 @media(max-width:650px){.infobox dl{grid-template-columns:minmax(0,1fr)}.infobox dt{padding-bottom:2px;border-bottom:0}.infobox dd{padding-top:0}}
 .infobox .info-subsection{padding:12px;border-top:1px solid var(--line)}.infobox .info-subsection h4{font:700 12px Arial,sans-serif;letter-spacing:.05em;text-transform:uppercase;margin:0 0 8px}.infobox .info-subsection ul{list-style:none;padding:0;margin:0}.infobox .info-subsection li{font:13px/1.6 Arial,sans-serif;margin:4px 0}.infobox .info-subsection a{font:inherit}
-</style></head><body><div id="reader" role="region" aria-label="Kyranda Codex"><p>Loading reader connection…</p></div><script>(() => {
+ .moments-list{list-style:none;padding:0;margin:0 0 22px}.moments-list li{padding:12px 0;border-bottom:1px solid var(--line)}.moments-list strong{font:600 16px Arial,sans-serif}.moment-episode{display:inline-block;margin-left:9px;color:var(--muted);font:11px Arial,sans-serif}.article-body .moments-list p{font:15px/1.6 Arial,sans-serif;margin:7px 0 0}.full-biography{border:1px solid var(--line);padding:12px 15px;margin:23px 0}.full-biography>summary{cursor:pointer;font:18px Georgia,serif}.full-biography>.story-arc:first-of-type{margin-top:15px}</style></head><body><div id="reader" role="region" aria-label="Kyranda Codex"><p>Loading reader connection…</p></div><script>(() => {
   // ui/dto.mjs
   var alias = (value) => typeof value === "string" && /^r-[0-9a-f]{32}$/.test(value);
   var text = (value, max = 6e3) => typeof value === "string" && value.length <= max && !/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(value);
@@ -315,6 +315,16 @@ function storyArcGroups(article) {
   if (!arcs || biography.some(x=>x.index>arcs[arcs.length-1].end)) return null;
   return arcs.map(arc=>({...arc,chapters:biography.filter(x=>x.index>=arc.start&&x.index<=arc.end)})).filter(arc=>arc.chapters.length);
 }
+// A compact, episode-safe presentation for Malcius. Full approved chapters stay intact.
+const MALCIUS_MOMENTS = Object.freeze([
+  {episode:1, heading:'A new adventuring party', text:'Joins the investigation near Sestone and tries to earn Sefi\'s trust.'},
+  {episode:3, heading:'A promise in Sestone', text:'Helps investigate the disappearances and offers to aid the missing villagers without payment.'},
+  {episode:13, heading:'The rift beneath Aelmor', text:'Bonds with a mysterious mote that empowers his lute as the party closes the rift.'},
+  {episode:17, heading:'A past shared', text:'Begins telling his companions more about the life he left behind.'},
+  {episode:29, heading:'Mercy or vengeance', text:'Disagrees with Todd over the fate of a surrendered enemy.'},
+  {episode:45, heading:'What he left behind', text:'Shares further details about his home and the people he misses.'}
+]);
+const MALCIUS_OVERVIEW = 'Malcius Sorrow is a flamboyant tiefling bard traveling with three other adventurers. Charming and theatrical, he prefers diplomacy to violence and frequently uses music to express himself. Although outwardly friendly, Malcius remains guarded about his past and the significance of his treasured lute.';
 function inventoryPresentation(facts) {
   const regular = [], documented = [], previous = [];
   for (const fact of facts) {
@@ -399,12 +409,14 @@ function setupWikiNavigation({ root, bridge, onOpen, onCategory, onDirectory }) 
     const inventorySections = hasInventoryFacts || dto.article?.sections.some(isInventoryHistory);
     q('.toc-group').hidden = !storySections.length && !inventorySections;
     const arcs=storyArcGroups(dto.article);
-    const tocItems=arcs ? arcs.map(arc=>({section:{heading:arc.title},index:arc.start,arc:true})) : storySections;
-    tocItems.forEach(({section, index, arc}) => {
-      const li = make('li'), a = make('a', section.heading); a.href = arc ? `#arc-${index}` : `#section-${index}`;
+    const compactMalcius=state.campaign==='main' && dto.article?.slug===MALCIUS_PUBLIC_ALIAS;
+    const tocItems=compactMalcius ? [{section:{heading:'Notable story moments'},id:'moments'},{section:{heading:'Further details'},id:'further-details'}] : arcs ? arcs.map(arc=>({section:{heading:arc.title},index:arc.start,arc:true})) : storySections;
+    tocItems.forEach(({section, index, arc, id}) => {
+      const target=id ? `#${id}` : arc ? `#arc-${index}` : `#section-${index}`;
+      const li = make('li'), a = make('a', section.heading); a.href = target;
       a.addEventListener('click', event => {
         event.preventDefault(); if (current !== serial) return; closeMobile();
-        requestAnimationFrame(() => { const heading = q(arc ? `#arc-${index}` : `#section-${index}`); if (heading) { heading.closest('details')?.setAttribute('open',''); heading.focus({ preventScroll: true }); heading.scrollIntoView({ block: 'start' }); } });
+        requestAnimationFrame(() => { const heading = q(target); if (heading) { heading.closest('details')?.setAttribute('open',''); heading.focus({ preventScroll: true }); heading.scrollIntoView({ block: 'start' }); } });
       }); li.append(a); q('.sidebar-toc').append(li);
     });
     if (inventorySections) {
@@ -529,7 +541,8 @@ function setupWikiNavigation({ root, bridge, onOpen, onCategory, onDirectory }) 
           }
         };
         const arcs=storyArcGroups(article);
-        if (biography.length > 1) body.append(el('p',arcs?`Explore ${arcs.length} story ${arcs.length === 1 ? 'arc' : 'arcs'}. Open an arc to see its chapters in order.`:'Select a chapter to expand its story. Chapters stay in chronological order.','bio-intro'));
+        const isMalcius=state.campaign==='main' && article.slug===MALCIUS_PUBLIC_ALIAS;
+        if (!isMalcius && biography.length > 1) body.append(el('p',arcs?`Explore ${arcs.length} story ${arcs.length === 1 ? 'arc' : 'arcs'}. Open an arc to see its chapters in order.`:'Select a chapter to expand its story. Chapters stay in chronological order.','bio-intro'));
         const makeChapter=({section,i},index,openFirst) => {
           const chapter = el('details',void 0,'bio-chapter');
           chapter.open = openFirst && index === 0;
@@ -541,14 +554,36 @@ function setupWikiNavigation({ root, bridge, onOpen, onCategory, onDirectory }) 
           addParagraphs(copy,section,i);
           chapter.append(heading,copy); return chapter;
         };
-        if (arcs) arcs.forEach((arc,index)=>{
-          const group=el('details',void 0,'story-arc'), heading=el('summary',arc.title), chapters=el('div',void 0,'arc-chapters');
-          heading.id=`arc-${arc.start}`; heading.dataset.tocAnchor='true'; heading.tabIndex=-1;
-          group.open=index===0;
-          arc.chapters.forEach((item,i)=>chapters.append(makeChapter({section:item.section,i:item.index},i,false)));
-          group.append(heading,chapters); body.append(group);
-        });
-        else biography.forEach((item,index)=>body.append(makeChapter(item,index,true)));
+        const appendArcs=parent=>{
+          if (arcs) arcs.forEach((arc,index)=>{
+            const group=el('details',void 0,'story-arc'), heading=el('summary',arc.title), chapters=el('div',void 0,'arc-chapters');
+            heading.id=`arc-${arc.start}`; heading.dataset.tocAnchor='true'; heading.tabIndex=-1;
+            group.open=!isMalcius && index===0;
+            arc.chapters.forEach((item,i)=>chapters.append(makeChapter({section:item.section,i:item.index},i,false)));
+            group.append(heading,chapters); parent.append(group);
+          });
+          else biography.forEach((item,index)=>parent.append(makeChapter(item,index,!isMalcius)));
+        };
+        if (isMalcius) {
+          q('.article-intro').textContent=MALCIUS_OVERVIEW;
+          const shown=MALCIUS_MOMENTS.filter(moment=>moment.episode<=state.episode && biography.some(({section})=>section.episode<=moment.episode));
+          if (shown.length) {
+            const moments=el('section',void 0,'character-moments'), heading=el('h3','Notable story moments');
+            heading.id='moments'; heading.dataset.tocAnchor='true'; heading.tabIndex=-1;
+            const list=el('ul',void 0,'moments-list');
+            shown.forEach(moment=>{
+              const li=el('li'), name=el('strong',moment.heading), ep=el('span',`Episode ${moment.episode}`,'moment-episode');
+              li.append(name,ep,el('p',moment.text)); list.append(li);
+            });
+            moments.append(heading,list); body.append(moments);
+          }
+          if (biography.length) {
+            const details=el('details',void 0,'full-biography');
+            const summary=el('summary',`Further details (${biography.length} chapters)`);
+            summary.id='further-details'; summary.dataset.tocAnchor='true'; summary.tabIndex=-1;
+            details.append(summary); appendArcs(details); body.append(details);
+          }
+        } else appendArcs(body);
         const inventory = inventoryPresentation(decoration.facts);
         if (inventory.documented.length || inventory.previous.length || history.length) {
           const panel = el('section',void 0,'inventory-panel'), title = el('h3','Inventory');
