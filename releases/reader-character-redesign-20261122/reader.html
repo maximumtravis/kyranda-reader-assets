@@ -617,7 +617,7 @@ function setupWikiNavigation({ root, bridge, onOpen, onCategory, onDirectory }) 
           }
           if (biography.length) {
             const details=el('details',void 0,'full-biography');
-            const summary=el('summary',`Further details (${biography.length} chapters)`);
+            const summary=el('summary',`Further details (${biography.length} ${biography.length === 1 ? 'chapter' : 'chapters'})`);
             summary.id='further-details'; summary.dataset.tocAnchor='true'; summary.tabIndex=-1;
             details.append(summary); appendArcs(details); body.append(details);
           }
