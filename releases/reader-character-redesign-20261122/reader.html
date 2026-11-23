@@ -317,12 +317,12 @@ function storyArcGroups(article) {
 }
 // A compact, episode-safe presentation for Malcius. Full approved chapters stay intact.
 const MALCIUS_MOMENTS = Object.freeze([
-  {episode:1, heading:'A new adventuring party', text:'Joins the investigation near Sestone and tries to earn Sefi\'s trust.'},
-  {episode:3, heading:'A promise in Sestone', text:'Helps investigate the disappearances and offers to aid the missing villagers without payment.'},
-  {episode:13, heading:'The rift beneath Aelmor', text:'Bonds with a mysterious mote that empowers his lute as the party closes the rift.'},
-  {episode:17, heading:'A past shared', text:'Begins telling his companions more about the life he left behind.'},
-  {episode:29, heading:'Mercy or vengeance', text:'Disagrees with Todd over the fate of a surrendered enemy.'},
-  {episode:45, heading:'What he left behind', text:'Shares further details about his home and the people he misses.'}
+  {episode:1, sourceHeading:'A Traveling Bard', heading:'A new adventuring party', text:'Joins the investigation near Sestone and tries to earn Sefi\'s trust.'},
+  {episode:3, sourceHeading:'A Promise in Sestone', heading:'A promise in Sestone', text:'Helps investigate the disappearances and offers to aid the missing villagers without payment.'},
+  {episode:13, sourceHeading:'The Rift Beneath Aelmor', heading:'The rift beneath Aelmor', text:'Bonds with a mysterious mote that empowers his lute as the party closes the rift.'},
+  {episode:17, sourceHeading:'A Story Finally Shared', heading:'A past shared', text:'Begins telling his companions more about the life he left behind.'},
+  {episode:29, sourceHeading:'Mercy or Vengeance', heading:'Mercy or vengeance', text:'Disagrees with Todd over the fate of a surrendered enemy.'},
+  {episode:45, sourceHeading:'What He Left Behind', heading:'What he left behind', text:'Shares further details about his home and the people he misses.'}
 ]);
 const MALCIUS_OVERVIEW = 'Malcius Sorrow is a flamboyant tiefling bard traveling with three other adventurers. Charming and theatrical, he prefers diplomacy to violence and frequently uses music to express himself. Although outwardly friendly, Malcius remains guarded about his past and the significance of his treasured lute.';
 function inventoryPresentation(facts) {
@@ -566,7 +566,7 @@ function setupWikiNavigation({ root, bridge, onOpen, onCategory, onDirectory }) 
         };
         if (isMalcius) {
           q('.article-intro').textContent=MALCIUS_OVERVIEW;
-          const shown=MALCIUS_MOMENTS.filter(moment=>moment.episode<=state.episode && biography.some(({section})=>section.episode<=moment.episode));
+          const shown=MALCIUS_MOMENTS.filter(moment=>moment.episode<=state.episode && biography.some(({section})=>section.heading===moment.sourceHeading));
           if (shown.length) {
             const moments=el('section',void 0,'character-moments'), heading=el('h3','Notable story moments');
             heading.id='moments'; heading.dataset.tocAnchor='true'; heading.tabIndex=-1;
