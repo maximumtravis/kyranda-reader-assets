@@ -343,12 +343,12 @@ const MALCIUS_MOMENTS = Object.freeze([
   {episode:29, sourceHeading:'Mercy or Vengeance', heading:'Mercy or vengeance', text:'Disagrees with Todd over the fate of a surrendered enemy.'},
   {episode:45, sourceHeading:'What He Left Behind', heading:'What he left behind', text:'Shares further details about his home and the people he misses.'}
 ]);
-const MALCIUS_OVERVIEW = 'Malcius Sorrow is a flamboyant tiefling bard traveling with three other adventurers. Charming and theatrical, he prefers diplomacy to violence and frequently uses music to express himself. Although outwardly friendly, Malcius remains guarded about his past and the significance of his treasured lute.';
+const MALCIUS_OVERVIEW = 'Malcius Sorrow is a theatrical bard who favors conversation over violence. His music and easy charm conceal a past he is reluctant to discuss.';
 // Concise character introductions and moments; visibility is checked against
 // the approved, episode-filtered section headings returned by the Wix reader.
 const COMPACT_CHARACTER_PRESENTATIONS = Object.freeze({
   'r-1b73c85c437fc5770f1277baee82e0a5': {
-    overview:'Sefi is a formidable goliath fighter who travels with three other adventurers investigating disappearances around Sestone. Having earned her freedom after military service, she is independent, guarded, and fiercely capable with her two longswords.',
+    overview:'Sefi is a guarded, fiercely capable fighter whose hard-won independence shapes how she approaches the party and its troubles.',
     moments:[
       {episode:1,sourceHeading:'Freedom bought through service',heading:'A hard-won freedom',text:'After her village was attacked, Sefi served in the military and eventually bought her freedom.'},
       {episode:13,sourceHeading:'The village and Firion',heading:'Memories of home',text:'A vision revisits the attack on her village, while memories of Sergeant Firion reveal an important bond.'},
@@ -359,7 +359,7 @@ const COMPACT_CHARACTER_PRESENTATIONS = Object.freeze({
     ]
   },
   'r-49b98702f12097407bc64992859d7c6b': {
-    overview:'Thormir Moonsight is a dwarf druid searching for answers about the destruction of his mountain village. A pirate flag and a giant\'s tooth are among his clues. Practical and resourceful, he travels with the party while following the trail of those responsible.',
+    overview:'Thormir Moonsight is a resourceful druid searching for answers about the destruction of his home. He follows the clues while standing by his companions.',
     moments:[
       {episode:1,sourceHeading:'A druid searching for answers',heading:'A ruined home',text:'Thormir sets out to learn who destroyed his village.'},
       {episode:10,sourceHeading:'Thirty years in a moment',heading:'Thirty years older',text:'An encounter with Otwic Anthomodous\'s apparition magically ages him from forty to seventy.'},
@@ -370,7 +370,7 @@ const COMPACT_CHARACTER_PRESENTATIONS = Object.freeze({
     ]
   },
   'r-3e5b9615896e0bf388a2e21eb445d6a6': {
-    overview:'Todd Van Wyk is an elderly half-elf rogue traveling with a red mask he cannot remove. Gaps in his memory and an unusual petrified rat discovered during earlier travels make him one of the party\'s more mysterious members.',
+    overview:'Todd Van Wyk is a mysterious rogue with gaps in his memory and a red mask he cannot remove. An unusual petrified rat adds to the questions surrounding him.',
     moments:[
       {episode:1,sourceHeading:'The masked adventurer',heading:'The masked adventurer',text:'Todd joins the party with an unremovable red mask and unanswered questions about his past.'},
       {episode:14,sourceHeading:'The presence in the rat',heading:'The rat\'s presence',text:'The petrified rat begins to reveal something more than an unusual keepsake.'},
@@ -623,7 +623,8 @@ function setupWikiNavigation({ root, bridge, onOpen, onCategory, onDirectory }) 
         };
         if (compactCharacter) {
           q('.article-intro').textContent=compactConfig.overview;
-          const shown=compactConfig.moments.filter(moment=>moment.episode<=state.episode && biography.some(({section})=>section.heading===moment.sourceHeading));
+          const eligibleMoments=compactConfig.moments.filter(moment=>moment.episode<=state.episode && biography.some(({section})=>section.heading===moment.sourceHeading));
+          const shown=eligibleMoments.length>4 ? [eligibleMoments[0],...eligibleMoments.slice(-3)] : eligibleMoments;
           if (shown.length) {
             const moments=el('section',void 0,'character-moments'), heading=el('h3','Notable story moments');
             heading.id='moments'; heading.dataset.tocAnchor='true'; heading.tabIndex=-1;
