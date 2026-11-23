@@ -325,6 +325,43 @@ const MALCIUS_MOMENTS = Object.freeze([
   {episode:45, sourceHeading:'What He Left Behind', heading:'What he left behind', text:'Shares further details about his home and the people he misses.'}
 ]);
 const MALCIUS_OVERVIEW = 'Malcius Sorrow is a flamboyant tiefling bard traveling with three other adventurers. Charming and theatrical, he prefers diplomacy to violence and frequently uses music to express himself. Although outwardly friendly, Malcius remains guarded about his past and the significance of his treasured lute.';
+// Concise character introductions and moments; visibility is checked against
+// the approved, episode-filtered section headings returned by the Wix reader.
+const COMPACT_CHARACTER_PRESENTATIONS = Object.freeze({
+  'r-1b73c85c437fc5770f1277baee82e0a5': {
+    overview:'Sefi is a formidable goliath fighter who travels with three other adventurers investigating disappearances around Sestone. Having earned her freedom after military service, she is independent, guarded, and fiercely capable with her two longswords.',
+    moments:[
+      {episode:1,sourceHeading:'Freedom bought through service',heading:'A hard-won freedom',text:'After her village was attacked, Sefi served in the military and eventually bought her freedom.'},
+      {episode:13,sourceHeading:'The village and Firion',heading:'Memories of home',text:'A vision revisits the attack on her village, while memories of Sergeant Firion reveal an important bond.'},
+      {episode:15,sourceHeading:'Ora',heading:'A new connection',text:'Sefi develops a connection with Ora during the party\'s encounters with the motes.'},
+      {episode:34,sourceHeading:'Margaret Smith',heading:'Margaret Smith',text:'An encounter with Margaret Smith becomes another part of Sefi\'s journey.'},
+      {episode:40,sourceHeading:'Taking responsibility for Jeremiah',heading:'Looking after Jeremiah',text:'Sefi takes responsibility for Jeremiah as the party moves forward.'},
+      {episode:47,sourceHeading:'The Hall of the Fallen',heading:'The Hall of the Fallen',text:'Sefi uncovers another piece of her past at the Hall of the Fallen.'}
+    ]
+  },
+  'r-49b98702f12097407bc64992859d7c6b': {
+    overview:'Thormir Moonsight is a dwarf druid searching for answers about the destruction of his mountain village. A pirate flag and a giant\'s tooth are among his clues. Practical and resourceful, he travels with the party while following the trail of those responsible.',
+    moments:[
+      {episode:1,sourceHeading:'A druid searching for answers',heading:'A ruined home',text:'Thormir sets out to learn who destroyed his village.'},
+      {episode:10,sourceHeading:'Thirty years in a moment',heading:'Thirty years older',text:'An encounter with Otwic Anthomodous\'s apparition magically ages him from forty to seventy.'},
+      {episode:22,sourceHeading:'A familiar missing tooth',heading:'A familiar clue',text:'A discovery involving a missing tooth adds to the mystery surrounding his home.'},
+      {episode:31,sourceHeading:'Refusing to turn on his companions',heading:'Loyal to the party',text:'Thormir refuses to turn against his companions.'},
+      {episode:44,sourceHeading:'Another mote form',heading:'Changing forms',text:'His connection to the motes manifests in another form.'},
+      {episode:47,sourceHeading:'Moonstones and a name',heading:'Moonstones and a name',text:'New information about moonstones brings further developments in his search.'}
+    ]
+  },
+  'r-3e5b9615896e0bf388a2e21eb445d6a6': {
+    overview:'Todd Van Wyk is an elderly half-elf rogue traveling with a red mask he cannot remove. Gaps in his memory and an unusual petrified rat discovered during earlier travels make him one of the party\'s more mysterious members.',
+    moments:[
+      {episode:1,sourceHeading:'The masked adventurer',heading:'The masked adventurer',text:'Todd joins the party with an unremovable red mask and unanswered questions about his past.'},
+      {episode:14,sourceHeading:'The presence in the rat',heading:'The rat\'s presence',text:'The petrified rat begins to reveal something more than an unusual keepsake.'},
+      {episode:34,sourceHeading:'The mask begins to move',heading:'A changing mask',text:'Todd\'s mask begins to move, raising new questions about its nature.'},
+      {episode:36,sourceHeading:'The new patron',heading:'A new patron',text:'A strange intervention restores Todd and introduces a new patron.'},
+      {episode:39,sourceHeading:'Stolen equipment',heading:'Stolen equipment',text:'Todd acquires unusual equipment during the festival.'},
+      {episode:47,sourceHeading:'Alone in the woods',heading:'Alone in the woods',text:'Todd faces a sinister threat while separated from his companions.'}
+    ]
+  }
+});
 function inventoryPresentation(facts) {
   const regular = [], documented = [], previous = [];
   for (const fact of facts) {
@@ -409,8 +446,8 @@ function setupWikiNavigation({ root, bridge, onOpen, onCategory, onDirectory }) 
     const inventorySections = hasInventoryFacts || dto.article?.sections.some(isInventoryHistory);
     q('.toc-group').hidden = !storySections.length && !inventorySections;
     const arcs=storyArcGroups(dto.article);
-    const compactMalcius=state.campaign==='main' && dto.article?.slug===MALCIUS_PUBLIC_ALIAS;
-    const tocItems=compactMalcius ? [{section:{heading:'Notable story moments'},id:'moments'},{section:{heading:'Further details'},id:'further-details'}] : arcs ? arcs.map(arc=>({section:{heading:arc.title},index:arc.start,arc:true})) : storySections;
+    const compactCharacter=state.campaign==='main' && (dto.article?.slug===MALCIUS_PUBLIC_ALIAS || !!COMPACT_CHARACTER_PRESENTATIONS[dto.article?.slug]);
+    const tocItems=compactCharacter ? [{section:{heading:'Notable story moments'},id:'moments'},{section:{heading:'Further details'},id:'further-details'}] : arcs ? arcs.map(arc=>({section:{heading:arc.title},index:arc.start,arc:true})) : storySections;
     tocItems.forEach(({section, index, arc, id}) => {
       const target=id ? `#${id}` : arc ? `#arc-${index}` : `#section-${index}`;
       const li = make('li'), a = make('a', section.heading); a.href = target;
@@ -541,8 +578,9 @@ function setupWikiNavigation({ root, bridge, onOpen, onCategory, onDirectory }) 
           }
         };
         const arcs=storyArcGroups(article);
-        const isMalcius=state.campaign==='main' && article.slug===MALCIUS_PUBLIC_ALIAS;
-        if (!isMalcius && biography.length > 1) body.append(el('p',arcs?`Explore ${arcs.length} story ${arcs.length === 1 ? 'arc' : 'arcs'}. Open an arc to see its chapters in order.`:'Select a chapter to expand its story. Chapters stay in chronological order.','bio-intro'));
+        const compactConfig=state.campaign==='main' ? (article.slug===MALCIUS_PUBLIC_ALIAS ? {overview:MALCIUS_OVERVIEW,moments:MALCIUS_MOMENTS} : COMPACT_CHARACTER_PRESENTATIONS[article.slug]) : null;
+        const compactCharacter=!!compactConfig;
+        if (!compactCharacter && biography.length > 1) body.append(el('p',arcs?`Explore ${arcs.length} story ${arcs.length === 1 ? 'arc' : 'arcs'}. Open an arc to see its chapters in order.`:'Select a chapter to expand its story. Chapters stay in chronological order.','bio-intro'));
         const makeChapter=({section,i},index,openFirst) => {
           const chapter = el('details',void 0,'bio-chapter');
           chapter.open = openFirst && index === 0;
@@ -558,15 +596,15 @@ function setupWikiNavigation({ root, bridge, onOpen, onCategory, onDirectory }) 
           if (arcs) arcs.forEach((arc,index)=>{
             const group=el('details',void 0,'story-arc'), heading=el('summary',arc.title), chapters=el('div',void 0,'arc-chapters');
             heading.id=`arc-${arc.start}`; heading.dataset.tocAnchor='true'; heading.tabIndex=-1;
-            group.open=!isMalcius && index===0;
+            group.open=!compactCharacter && index===0;
             arc.chapters.forEach((item,i)=>chapters.append(makeChapter({section:item.section,i:item.index},i,false)));
             group.append(heading,chapters); parent.append(group);
           });
-          else biography.forEach((item,index)=>parent.append(makeChapter(item,index,!isMalcius)));
+          else biography.forEach((item,index)=>parent.append(makeChapter(item,index,!compactCharacter)));
         };
-        if (isMalcius) {
-          q('.article-intro').textContent=MALCIUS_OVERVIEW;
-          const shown=MALCIUS_MOMENTS.filter(moment=>moment.episode<=state.episode && biography.some(({section})=>section.heading===moment.sourceHeading));
+        if (compactCharacter) {
+          q('.article-intro').textContent=compactConfig.overview;
+          const shown=compactConfig.moments.filter(moment=>moment.episode<=state.episode && biography.some(({section})=>section.heading===moment.sourceHeading));
           if (shown.length) {
             const moments=el('section',void 0,'character-moments'), heading=el('h3','Notable story moments');
             heading.id='moments'; heading.dataset.tocAnchor='true'; heading.tabIndex=-1;
