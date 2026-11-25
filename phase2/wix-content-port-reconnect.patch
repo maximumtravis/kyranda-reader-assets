@@ -1,0 +1,11 @@
+--- a/public/codexContentPort.js
++++ b/public/codexContentPort.js
+@@ -81,6 +81,8 @@
+               (message.revision === latestSync.revision && latestSync.phase === 'ready' && message.phase === 'loading')))) return false;
+         latestSync = JSON.parse(JSON.stringify(message));
+       }
++      // RPC replies belong to the connection that accepted the request.
++      if (!accepted && message.type === 'codex-response') return false;
+       if (accepted) send(message);
+       else if (message.type !== 'codex-init' && message.type !== 'codex-sync') {
+         if (queue.length >= 32) return false;

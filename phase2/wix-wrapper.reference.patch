@@ -1,0 +1,17 @@
+--- a/backend/codexUnifiedPublic.web.js
++++ b/backend/codexUnifiedPublic.web.js
+@@ -3,2 +3,4 @@
+ import {createFrozenContextualReader} from 'backend/codexContextualLinksReader';
++import {selectEditorialReader} from 'backend/codexEditorialAnnotations';
++import {editorialAnnotationConfig,readEditorialAnnotationSnapshot} from 'backend/codexEditorialAnnotationData';
+ import {Permissions,webMethod} from 'wix-web-module';
+@@ -23,2 +25,4 @@
+ const contextualReader=createFrozenContextualReader({readReader:reader,enabled:true,executionScope:'production'});
++const phase2Reader=selectEditorialReader({contextualReader,deploymentSiteId:publicDeploymentConfig.siteId,
++  config:editorialAnnotationConfig,readSnapshot:readEditorialAnnotationSnapshot});
+ export const getUnifiedPublicCodex=webMethod(Permissions.Anyone,async request=>{
+@@ -29,3 +33,3 @@
+   if(!PUBLIC_UNIFIED_ENDPOINT_ENABLED)return emptyReader();
+-  try{return await contextualReader(request);}catch{return emptyReader();}
++  try{return await phase2Reader(request);}catch{return emptyReader();}
+ });
